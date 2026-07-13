@@ -26,6 +26,7 @@ namespace LaberintoInteractivo
         public bool BossActive { get; set; }
         public int BossFreezeTurns { get; set; } = 0;
         public int BossSpeedMultiplier { get; set; } = 1;
+        public int BossSpeedBoostTurns { get; set; } = 0;
         public int PlayerSpeedBoostTurns { get; set; } = 0;
 
         public event Action<bool> OnLevelCompleted; // bool: got all stars
@@ -65,6 +66,8 @@ namespace LaberintoInteractivo
             BossSpeedMultiplier = 1; 
             BossFreezeTurns = 0; 
             PlayerSpeedBoostTurns = 0;
+            BossSpeedBoostTurns = 0;
+            AudioPlayer.StopAllSounds();
 
             // Si el jugador ya existe, actualizarlo. Si no, crearlo.
             if (Player1 == null)
@@ -109,13 +112,16 @@ namespace LaberintoInteractivo
                     {
                         CurrentLevel.Grid[newY, newX] = 0;
                         BossSpeedMultiplier = 2; 
+                        BossSpeedBoostTurns = 10;
+                        AudioPlayer.PlaySound(@"Assets\boost_morado.mp3", "morado");
                     }
                     else if (targetCell == 5) // BOOST DORADO
                     {
                         CurrentLevel.Grid[newY, newX] = 0;
                         Random rnd = new Random();
-                        if (rnd.Next(2) == 0) { BossFreezeTurns = 3; } 
-                        else { PlayerSpeedBoostTurns = 3; }
+                        if (rnd.Next(2) == 0) { BossFreezeTurns = 10; } 
+                        else { PlayerSpeedBoostTurns = 10; }
+                        AudioPlayer.PlaySound(@"Assets\boost_dorado.mp3", "dorado");
                     }
 
                     Player1.MoveTo(new Point(newX, newY));
@@ -125,8 +131,27 @@ namespace LaberintoInteractivo
                     if (BossActive)
                     {
                         _bossTurnCounter++;
-                        if (BossFreezeTurns > 0) { BossFreezeTurns--; } 
-                        else if (PlayerSpeedBoostTurns > 0) { PlayerSpeedBoostTurns--; }
+                        
+                        if (BossSpeedBoostTurns > 0)
+                        {
+                            BossSpeedBoostTurns--;
+                            if (BossSpeedBoostTurns == 0)
+                            {
+                                BossSpeedMultiplier = 1;
+                                AudioPlayer.StopSound("morado");
+                            }
+                        }
+
+                        if (BossFreezeTurns > 0) 
+                        { 
+                            BossFreezeTurns--; 
+                            if (BossFreezeTurns == 0) AudioPlayer.StopSound("dorado");
+                        } 
+                        else if (PlayerSpeedBoostTurns > 0) 
+                        { 
+                            PlayerSpeedBoostTurns--; 
+                            if (PlayerSpeedBoostTurns == 0) AudioPlayer.StopSound("dorado");
+                        }
                         else if (_bossTurnCounter % 2 == 0 || BossSpeedMultiplier > 1) 
                         {
                             for (int i = 0; i < BossSpeedMultiplier; i++) 
@@ -139,6 +164,7 @@ namespace LaberintoInteractivo
 
                                 if (BossPosition.X == Player1.CurrentPosition.X && BossPosition.Y == Player1.CurrentPosition.Y)
                                 {
+                                    AudioPlayer.StopAllSounds();
                                     OnGameOver?.Invoke();
                                     return;
                                 }
@@ -146,6 +172,7 @@ namespace LaberintoInteractivo
                         }
                         if (BossPosition.X == Player1.CurrentPosition.X && BossPosition.Y == Player1.CurrentPosition.Y)
                         {
+                            AudioPlayer.StopAllSounds();
                             OnGameOver?.Invoke();
                             return;
                         }
@@ -171,6 +198,7 @@ namespace LaberintoInteractivo
             }
             else
             {
+                AudioPlayer.StopAllSounds();
                 OnGameWon?.Invoke(gotAllStars);
             }
         }
