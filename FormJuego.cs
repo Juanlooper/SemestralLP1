@@ -22,6 +22,9 @@ namespace LaberintoInteractivo
         private Image _floorTexture;
         private Image _noteTexture;
         private Image _exitTexture;
+        private Image _bossTexture;
+        private Image _trapTexture;
+        private Image _boostTexture;
         
         // Optimización de Renderizado (UI manejada nativamente por WinForms Image)
         // Eliminado _mapBuffer manual
@@ -39,6 +42,9 @@ namespace LaberintoInteractivo
                 _floorTexture = Image.FromFile(@"Assets\floor_texture.png");
                 _noteTexture = Image.FromFile(@"Assets\note_texture.png");
                 _exitTexture = Image.FromFile(@"Assets\exit_texture.png");
+                _bossTexture = Image.FromFile(@"Assets\boss_texture.png");
+                _trapTexture = Image.FromFile(@"Assets\trap_texture.png");
+                _boostTexture = Image.FromFile(@"Assets\boost_texture.png");
             }
             catch (Exception)
             {
@@ -48,6 +54,7 @@ namespace LaberintoInteractivo
             _gameManager = new GameManager();
             _gameManager.OnLevelCompleted += GameManager_OnLevelCompleted;
             _gameManager.OnGameWon += GameManager_OnGameWon;
+            _gameManager.OnGameOver += GameManager_OnGameOver;
 
             this.BackColor = Color.Black;
             this.ForeColor = Color.White;
@@ -106,6 +113,8 @@ namespace LaberintoInteractivo
                 using (Image scaledFloor = _floorTexture != null ? new Bitmap(_floorTexture, cw > 0 ? cw : 1, ch > 0 ? ch : 1) : null)
                 using (Image scaledNote = _noteTexture != null ? new Bitmap(_noteTexture, nw > 0 ? nw : 1, nh > 0 ? nh : 1) : null)
                 using (Image scaledExit = _exitTexture != null ? new Bitmap(_exitTexture, cw > 0 ? cw : 1, ch > 0 ? ch : 1) : null)
+                using (Image scaledTrap = _trapTexture != null ? new Bitmap(_trapTexture, cw > 0 ? cw : 1, ch > 0 ? ch : 1) : null)
+                using (Image scaledBoost = _boostTexture != null ? new Bitmap(_boostTexture, cw > 0 ? cw : 1, ch > 0 ? ch : 1) : null)
                 {
                     for (int y = 0; y < rows; y++)
                     {
@@ -163,6 +172,26 @@ namespace LaberintoInteractivo
                                             g.FillRectangle(exitBrush, rect);
                                     }
                                 }
+                                else if (cellValue == 4) 
+                                {
+                                    if (scaledTrap != null)
+                                        g.DrawImage(scaledTrap, rect.X, rect.Y, cellWidth, cellHeight);
+                                    else
+                                    {
+                                        using (Brush trapBrush = new SolidBrush(Color.Purple))
+                                            g.FillRectangle(trapBrush, rect);
+                                    }
+                                }
+                                else if (cellValue == 5) 
+                                {
+                                    if (scaledBoost != null)
+                                        g.DrawImage(scaledBoost, rect.X, rect.Y, cellWidth, cellHeight);
+                                    else
+                                    {
+                                        using (Brush boostBrush = new SolidBrush(Color.Orange))
+                                            g.FillEllipse(boostBrush, rect);
+                                    }
+                                }
                             }
                         }
                     }
@@ -216,6 +245,20 @@ namespace LaberintoInteractivo
                 RectangleF playerRect = new RectangleF(playerPos.X * cellWidth, playerPos.Y * cellHeight, cellWidth, cellHeight);
                 g.DrawImage(_gameManager.Player1.AvatarImage, playerRect);
             }
+
+            if (_gameManager.BossActive)
+            {
+                RectangleF bossRect = new RectangleF(_gameManager.BossPosition.X * cellWidth, _gameManager.BossPosition.Y * cellHeight, cellWidth, cellHeight);
+                if (_bossTexture != null)
+                {
+                    g.DrawImage(_bossTexture, bossRect);
+                }
+                else
+                {
+                    using (Brush bossBrush = new SolidBrush(Color.Red))
+                        g.FillRectangle(bossBrush, bossRect);
+                }
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -236,13 +279,11 @@ namespace LaberintoInteractivo
                 if (moved)
                 {
                     UpdateStats();
-                    // Si recogimos un apunte, debemos redibujar la imagen estática
-                    if (_gameManager.StarsCollected > oldStars)
-                    {
-                        var oldImage = pbMaze.Image;
-                        pbMaze.Image = GenerateMapImage();
-                        if (oldImage != null) oldImage.Dispose();
-                    }
+                    // Redibujar la imagen estática en caso de recoger items o trampas
+                    var oldImage = pbMaze.Image;
+                    pbMaze.Image = GenerateMapImage();
+                    if (oldImage != null) oldImage.Dispose();
+                    
                     pbMaze.Invalidate();
                     return true;
                 }
@@ -275,10 +316,37 @@ namespace LaberintoInteractivo
         private void GameManager_OnGameWon(bool gotAllStars)
         {
             gameTimer.Stop();
-            
-            FormHistoria outro = new FormHistoria(true, gotAllStars);
             this.Hide();
-            outro.Show();
+            
+            using (FormHistoria outro = new FormHistoria(true, gotAllStars))
+            {
+                outro.ShowDialog(this);
+            }
+            
+            this.Close();
+        }
+
+        private async void GameManager_OnGameOver()
+        {
+            gameTimer.Stop();
+
+            Form screamer = new Form();
+            screamer.FormBorderStyle = FormBorderStyle.None;
+            screamer.WindowState = FormWindowState.Maximized;
+            screamer.BackColor = Color.Black;
+            try {
+                screamer.BackgroundImage = Image.FromFile(@"Assets\screamer.png");
+                screamer.BackgroundImageLayout = ImageLayout.Zoom;
+            } catch {}
+            screamer.TopMost = true;
+            screamer.Show();
+
+            await System.Threading.Tasks.Task.Delay(1500);
+            
+            screamer.Close();
+
+            MessageBox.Show("¡El acosador te ha atrapado! Fin del juego.", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            this.Close(); // Regresará al menú
         }
 
         private void pbMaze_Resize(object sender, EventArgs e)
