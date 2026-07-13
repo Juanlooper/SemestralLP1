@@ -25,6 +25,7 @@ namespace LaberintoInteractivo
             this.btnMods = new System.Windows.Forms.Button();
             this.contextMenuStripMods = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.donPolloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mod2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatarPreview)).BeginInit();
             this.contextMenuStripMods.SuspendLayout();
@@ -98,9 +99,10 @@ namespace LaberintoInteractivo
             // contextMenuStripMods
             // 
             this.contextMenuStripMods.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.donPolloToolStripMenuItem});
+            this.donPolloToolStripMenuItem,
+            this.mod2ToolStripMenuItem});
             this.contextMenuStripMods.Name = "contextMenuStripMods";
-            this.contextMenuStripMods.Size = new System.Drawing.Size(129, 26);
+            this.contextMenuStripMods.Size = new System.Drawing.Size(129, 48);
             // 
             // donPolloToolStripMenuItem
             // 
@@ -108,6 +110,15 @@ namespace LaberintoInteractivo
             this.donPolloToolStripMenuItem.Name = "donPolloToolStripMenuItem";
             this.donPolloToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.donPolloToolStripMenuItem.Text = "Don Pollo";
+            this.donPolloToolStripMenuItem.Click += new System.EventHandler(this.donPolloToolStripMenuItem_Click);
+            // 
+            // mod2ToolStripMenuItem
+            // 
+            this.mod2ToolStripMenuItem.CheckOnClick = true;
+            this.mod2ToolStripMenuItem.Name = "mod2ToolStripMenuItem";
+            this.mod2ToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.mod2ToolStripMenuItem.Text = "Mod 2";
+            this.mod2ToolStripMenuItem.Click += new System.EventHandler(this.mod2ToolStripMenuItem_Click);
             // 
             // btnExit
             // 
@@ -150,5 +161,6 @@ namespace LaberintoInteractivo
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripMods;
         private System.Windows.Forms.ToolStripMenuItem donPolloToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mod2ToolStripMenuItem;
     }
 }

@@ -9,7 +9,7 @@ namespace LaberintoInteractivo
         private GameManager _gameManager;
         private Image _avatarImage;
         private bool _isHardcore;
-        private bool _isDonPolloEnabled;
+        private int _activeMod;
 
         // Configuraciones visuales (Fallback)
         private readonly Color _wallColor = Color.FromArgb(15, 15, 15);
@@ -36,20 +36,26 @@ namespace LaberintoInteractivo
         private void UpdateMusicState()
         {
             mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
-            if (_gameManager != null && _gameManager.BossActive && _isDonPolloEnabled)
+            if (_gameManager != null && _gameManager.BossActive)
             {
-                string chaseAudioPath = System.IO.Path.GetFullPath(@"Assets\don-pollo-king.mp3");
-                mciSendString($"open \"{chaseAudioPath}\" type mpegvideo alias chaseMusic", null, 0, IntPtr.Zero);
-                mciSendString("play chaseMusic repeat", null, 0, IntPtr.Zero);
+                string chaseAudioPath = "";
+                if (_activeMod == 1) chaseAudioPath = System.IO.Path.GetFullPath(@"Assets\don-pollo-king.mp3");
+                else if (_activeMod == 2) chaseAudioPath = System.IO.Path.GetFullPath(@"Assets\Acosador audio mod 2.mpeg");
+                
+                if (!string.IsNullOrEmpty(chaseAudioPath))
+                {
+                    mciSendString($"open \"{chaseAudioPath}\" type mpegvideo alias chaseMusic", null, 0, IntPtr.Zero);
+                    mciSendString("play chaseMusic repeat", null, 0, IntPtr.Zero);
+                }
             }
         }
 
-        public FormJuego(Image avatar, bool isHardcore, bool isDonPolloEnabled)
+        public FormJuego(Image avatar, bool isHardcore, int activeMod)
         {
             InitializeComponent();
             _avatarImage = avatar;
             _isHardcore = isHardcore;
-            _isDonPolloEnabled = isDonPolloEnabled;
+            _activeMod = activeMod;
             
             try
             {
@@ -67,11 +73,19 @@ namespace LaberintoInteractivo
                 // Ignorar error si no están las imágenes (fallback a colores sólidos)
             }
             
-            if (_isDonPolloEnabled)
+            if (_activeMod == 1)
             {
                 try
                 {
                     _bossTexture = Image.FromFile(@"Assets\Don pollo perseguidor.jpg");
+                }
+                catch (Exception) { }
+            }
+            else if (_activeMod == 2)
+            {
+                try
+                {
+                    _bossTexture = Image.FromFile(@"Assets\Acosador imagen mod 2.jpeg");
                 }
                 catch (Exception) { }
             }
@@ -372,7 +386,7 @@ namespace LaberintoInteractivo
             gameTimer.Stop();
             mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
 
-            if (_isDonPolloEnabled)
+            if (_activeMod == 1)
             {
                 string screamerAudioPath = System.IO.Path.GetFullPath(@"Assets\un-video-mas-mi-gente-para-perder-el-tiempo.mp3");
                 mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
@@ -386,6 +400,30 @@ namespace LaberintoInteractivo
                 screamer.BackColor = Color.Black;
                 try {
                     screamer.BackgroundImage = Image.FromFile(System.IO.Path.GetFullPath(@"Assets\don pollo screamer.jpg"));
+                    screamer.BackgroundImageLayout = ImageLayout.Zoom;
+                } catch {}
+                screamer.TopMost = true;
+                screamer.Show();
+
+                await System.Threading.Tasks.Task.Delay(5000);
+                
+                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+                screamer.Close();
+            }
+            else if (_activeMod == 2)
+            {
+                string screamerAudioPath = System.IO.Path.GetFullPath(@"Assets\Screamer audio mod 2 (2).mpeg");
+                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+                mciSendString($"open \"{screamerAudioPath}\" type mpegvideo alias screamerMusic", null, 0, IntPtr.Zero);
+                mciSendString("setaudio screamerMusic volume to 1000", null, 0, IntPtr.Zero);
+                mciSendString("play screamerMusic", null, 0, IntPtr.Zero);
+
+                Form screamer = new Form();
+                screamer.FormBorderStyle = FormBorderStyle.None;
+                screamer.WindowState = FormWindowState.Maximized;
+                screamer.BackColor = Color.Black;
+                try {
+                    screamer.BackgroundImage = Image.FromFile(System.IO.Path.GetFullPath(@"Assets\Screamer mod 2.jpeg"));
                     screamer.BackgroundImageLayout = ImageLayout.Zoom;
                 } catch {}
                 screamer.TopMost = true;

@@ -42,6 +42,9 @@ namespace LaberintoInteractivo
             
             donPolloToolStripMenuItem.ForeColor = Color.Gold;
             donPolloToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            
+            mod2ToolStripMenuItem.ForeColor = Color.Gold;
+            mod2ToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
         }
 
         private void StyleButton(Button btn)
@@ -108,9 +111,11 @@ namespace LaberintoInteractivo
                 return;
             }
 
-            bool isDonPolloEnabled = donPolloToolStripMenuItem.Checked;
+            int activeMod = 0;
+            if (donPolloToolStripMenuItem.Checked) activeMod = 1;
+            else if (mod2ToolStripMenuItem.Checked) activeMod = 2;
 
-            FormJuego formJuego = new FormJuego(_avatarImage, isHardcore, isDonPolloEnabled);
+            FormJuego formJuego = new FormJuego(_avatarImage, isHardcore, activeMod);
             formJuego.FormClosed += (s, args) => this.Show(); // Volver a mostrar el menú al cerrar el juego
             this.Hide();
             formJuego.Show();
@@ -119,6 +124,22 @@ namespace LaberintoInteractivo
         private void btnMods_Click(object sender, EventArgs e)
         {
             contextMenuStripMods.Show(btnMods, new Point(0, btnMods.Height));
+        }
+
+        private void donPolloToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (donPolloToolStripMenuItem.Checked)
+            {
+                mod2ToolStripMenuItem.Checked = false;
+            }
+        }
+
+        private void mod2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (mod2ToolStripMenuItem.Checked)
+            {
+                donPolloToolStripMenuItem.Checked = false;
+            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)
