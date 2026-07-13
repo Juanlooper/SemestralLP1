@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,6 +11,7 @@ namespace LaberintoInteractivo
         private Image _avatarImage;
         private bool _isHardcore;
         private bool _isDonPolloEnabled;
+        private bool _isPaused = false;
 
         // Configuraciones visuales (Fallback)
         private readonly Color _wallColor = Color.FromArgb(15, 15, 15);
@@ -45,6 +47,16 @@ namespace LaberintoInteractivo
         public FormJuego(Image avatar, bool isHardcore, bool isDonPolloEnabled)
         {
             InitializeComponent();
+            
+            StyleButton(btnUp);
+            StyleButton(btnDown);
+            StyleButton(btnLeft);
+            StyleButton(btnRight);
+            StyleButton(btnPause);
+            StyleButton(btnResume);
+            StyleButton(btnExit);
+            StyleButton(btnTutorialOk);
+            
             _avatarImage = avatar;
             _isHardcore = isHardcore;
             _isDonPolloEnabled = isDonPolloEnabled;
@@ -110,11 +122,47 @@ namespace LaberintoInteractivo
             UpdateStats();
             pbMaze.Image = GenerateMapImage(); // Crear el mapa estático y asignarlo
             gameTimer.Interval = 1000;
-            gameTimer.Start();
             
             this.KeyPreview = true;
             this.Focus();
             pbMaze.Invalidate();
+
+            if (_gameManager.CurrentLevelNumber == 1 && !_isHardcore)
+            {
+                pnlTutorial.Visible = true;
+                pnlTutorial.BringToFront();
+                PauseGame();
+            }
+            else
+            {
+                ResumeGame();
+            }
+        }
+        
+        private void PauseGame()
+        {
+            _isPaused = true;
+            gameTimer.Stop();
+            if (_glowTimer != null) _glowTimer.Stop();
+        }
+
+        private void ResumeGame()
+        {
+            _isPaused = false;
+            gameTimer.Start();
+            if (_glowTimer != null) _glowTimer.Start();
+            this.Focus();
+        }
+
+        private void StyleButton(Button btn)
+        {
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 2;
+            btn.FlatAppearance.BorderColor = Color.DarkGoldenrod;
+            btn.BackColor = Color.FromArgb(200, 15, 15, 15);
+            btn.ForeColor = Color.Gold;
+            btn.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            btn.Cursor = Cursors.Hand;
         }
 
         protected override void OnShown(EventArgs e)
@@ -322,32 +370,79 @@ namespace LaberintoInteractivo
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if (_isPaused) return base.ProcessCmdKey(ref msg, keyData);
+
             if (_gameManager.CurrentLevel != null)
             {
-                bool moved = false;
-                int oldStars = _gameManager.StarsCollected;
-                
                 switch (keyData)
                 {
-                    case Keys.Up: _gameManager.MovePlayer(Direction.Up); moved = true; break;
-                    case Keys.Down: _gameManager.MovePlayer(Direction.Down); moved = true; break;
-                    case Keys.Left: _gameManager.MovePlayer(Direction.Left); moved = true; break;
-                    case Keys.Right: _gameManager.MovePlayer(Direction.Right); moved = true; break;
-                }
-
-                if (moved)
-                {
-                    UpdateStats();
-                    // Redibujar la imagen estática en caso de recoger items o trampas
-                    var oldImage = pbMaze.Image;
-                    pbMaze.Image = GenerateMapImage();
-                    if (oldImage != null) oldImage.Dispose();
-                    
-                    pbMaze.Invalidate();
-                    return true;
+                    case Keys.Up: 
+                    case Keys.W: HandleMove(Direction.Up); return true;
+                    case Keys.Down: 
+                    case Keys.S: HandleMove(Direction.Down); return true;
+                    case Keys.Left: 
+                    case Keys.A: HandleMove(Direction.Left); return true;
+                    case Keys.Right: 
+                    case Keys.D: HandleMove(Direction.Right); return true;
+                    case Keys.Escape: 
+                    case Keys.P: btnPause_Click(null, null); return true;
                 }
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void btnUp_Click(object sender, EventArgs e) => HandleMove(Direction.Up);
+        private void btnDown_Click(object sender, EventArgs e) => HandleMove(Direction.Down);
+        private void btnLeft_Click(object sender, EventArgs e) => HandleMove(Direction.Left);
+        private void btnRight_Click(object sender, EventArgs e) => HandleMove(Direction.Right);
+
+        private void HandleMove(Direction dir)
+        {
+            if (_isPaused || _gameManager.CurrentLevel == null) return;
+            
+            _gameManager.MovePlayer(dir);
+            
+            UpdateStats();
+            var oldImage = pbMaze.Image;
+            pbMaze.Image = GenerateMapImage();
+            if (oldImage != null) oldImage.Dispose();
+            
+            pbMaze.Invalidate();
+            this.Focus(); // Importante para que el teclado siga funcionando después de usar botones en pantalla
+        }
+
+        private void btnPause_Click(object sender, EventArgs e)
+        {
+            if (_isPaused && !pnlPauseMenu.Visible) return; // Pausado por tutorial
+
+            if (_isPaused)
+            {
+                pnlPauseMenu.Visible = false;
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+                pnlPauseMenu.Visible = true;
+                pnlPauseMenu.BringToFront();
+            }
+        }
+
+        private void btnResume_Click(object sender, EventArgs e)
+        {
+            pnlPauseMenu.Visible = false;
+            ResumeGame();
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close(); 
+        }
+
+        private void btnTutorialOk_Click(object sender, EventArgs e)
+        {
+            pnlTutorial.Visible = false;
+            ResumeGame();
         }
 
         private async void GameManager_OnLevelCompleted(bool gotAllStars)
