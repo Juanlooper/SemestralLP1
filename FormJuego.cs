@@ -30,17 +30,15 @@ namespace LaberintoInteractivo
         // Optimización de Renderizado (UI manejada nativamente por WinForms Image)
         // Eliminado _mapBuffer manual
 
-        [System.Runtime.InteropServices.DllImport("winmm.dll")]
-        private static extern long mciSendString(string command, System.Text.StringBuilder returnValue, int returnLength, IntPtr winHandle);
+        private System.Windows.Forms.Timer _glowTimer;
 
         private void UpdateMusicState()
         {
-            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
+            AudioPlayer.StopSound("chaseMusic");
             if (_gameManager != null && _gameManager.BossActive && _isDonPolloEnabled)
             {
                 string chaseAudioPath = System.IO.Path.GetFullPath(@"Assets\don-pollo-king.mp3");
-                mciSendString($"open \"{chaseAudioPath}\" type mpegvideo alias chaseMusic", null, 0, IntPtr.Zero);
-                mciSendString("play chaseMusic repeat", null, 0, IntPtr.Zero);
+                AudioPlayer.PlaySound(chaseAudioPath, "chaseMusic", true);
             }
         }
 
@@ -93,6 +91,15 @@ namespace LaberintoInteractivo
             this.ForeColor = Color.White;
 
             typeof(Control).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(pbMaze, true, null);
+
+            _glowTimer = new System.Windows.Forms.Timer();
+            _glowTimer.Interval = 50;
+            _glowTimer.Tick += (s, ev) => {
+                if (_gameManager != null && _gameManager.IsBoostActive) {
+                    pbMaze.Invalidate();
+                }
+            };
+            _glowTimer.Start();
 
             Start();
         }
@@ -285,6 +292,19 @@ namespace LaberintoInteractivo
                 g.DrawImage(_gameManager.Player1.AvatarImage, playerRect);
             }
 
+            if (_gameManager.IsBoostActive)
+            {
+                int timeMs = DateTime.Now.Millisecond + DateTime.Now.Second * 1000;
+                double pulseSpeed = _gameManager.IsBadBoostActive ? 0.002 : 0.01;
+                int r = (int)(Math.Sin(timeMs * pulseSpeed) * 127 + 128);
+                int g_c = (int)(Math.Sin(timeMs * pulseSpeed + 2) * 127 + 128);
+                int b = (int)(Math.Sin(timeMs * pulseSpeed + 4) * 127 + 128);
+                using (Brush overlayBrush = new SolidBrush(Color.FromArgb(100, r, g_c, b)))
+                {
+                    g.FillRectangle(overlayBrush, 0, 0, pbMaze.Width, pbMaze.Height);
+                }
+            }
+
             if (_gameManager.BossActive)
             {
                 RectangleF bossRect = new RectangleF(_gameManager.BossPosition.X * cellWidth, _gameManager.BossPosition.Y * cellHeight, cellWidth, cellHeight);
@@ -356,7 +376,7 @@ namespace LaberintoInteractivo
         private void GameManager_OnGameWon(bool gotAllStars)
         {
             gameTimer.Stop();
-            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
+            AudioPlayer.StopSound("chaseMusic");
             this.Hide();
             
             using (FormHistoria outro = new FormHistoria(true, gotAllStars))
@@ -370,15 +390,12 @@ namespace LaberintoInteractivo
         private async void GameManager_OnGameOver()
         {
             gameTimer.Stop();
-            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
+            AudioPlayer.StopSound("chaseMusic");
 
             if (_isDonPolloEnabled)
             {
                 string screamerAudioPath = System.IO.Path.GetFullPath(@"Assets\un-video-mas-mi-gente-para-perder-el-tiempo.mp3");
-                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
-                mciSendString($"open \"{screamerAudioPath}\" type mpegvideo alias screamerMusic", null, 0, IntPtr.Zero);
-                mciSendString("setaudio screamerMusic volume to 1000", null, 0, IntPtr.Zero);
-                mciSendString("play screamerMusic", null, 0, IntPtr.Zero);
+                AudioPlayer.PlaySound(screamerAudioPath, "screamerMusic", false);
 
                 Form screamer = new Form();
                 screamer.FormBorderStyle = FormBorderStyle.None;
@@ -393,7 +410,7 @@ namespace LaberintoInteractivo
 
                 await System.Threading.Tasks.Task.Delay(5000);
                 
-                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+                AudioPlayer.StopSound("screamerMusic");
                 screamer.Close();
             }
             else
@@ -431,8 +448,7 @@ namespace LaberintoInteractivo
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
-            mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+            AudioPlayer.StopAllSounds();
             base.OnFormClosed(e);
         }
     }
