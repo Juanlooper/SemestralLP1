@@ -15,14 +15,19 @@ namespace LaberintoInteractivo
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lblTitle = new System.Windows.Forms.Label();
             this.btnLoadAvatar = new System.Windows.Forms.Button();
             this.pbAvatarPreview = new System.Windows.Forms.PictureBox();
             this.btnPlayCampaign = new System.Windows.Forms.Button();
             this.btnPlayHardcore = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
+            this.btnMods = new System.Windows.Forms.Button();
+            this.contextMenuStripMods = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.donPolloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatarPreview)).BeginInit();
+            this.contextMenuStripMods.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblTitle
@@ -80,9 +85,33 @@ namespace LaberintoInteractivo
             this.btnPlayHardcore.UseVisualStyleBackColor = true;
             this.btnPlayHardcore.Click += new System.EventHandler(this.btnPlayHardcore_Click);
             // 
+            // btnMods
+            // 
+            this.btnMods.Location = new System.Drawing.Point(50, 390);
+            this.btnMods.Name = "btnMods";
+            this.btnMods.Size = new System.Drawing.Size(330, 50);
+            this.btnMods.TabIndex = 6;
+            this.btnMods.Text = "Mods";
+            this.btnMods.UseVisualStyleBackColor = true;
+            this.btnMods.Click += new System.EventHandler(this.btnMods_Click);
+            // 
+            // contextMenuStripMods
+            // 
+            this.contextMenuStripMods.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.donPolloToolStripMenuItem});
+            this.contextMenuStripMods.Name = "contextMenuStripMods";
+            this.contextMenuStripMods.Size = new System.Drawing.Size(129, 26);
+            // 
+            // donPolloToolStripMenuItem
+            // 
+            this.donPolloToolStripMenuItem.CheckOnClick = true;
+            this.donPolloToolStripMenuItem.Name = "donPolloToolStripMenuItem";
+            this.donPolloToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.donPolloToolStripMenuItem.Text = "Don Pollo";
+            // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(50, 390);
+            this.btnExit.Location = new System.Drawing.Point(50, 460);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(330, 50);
             this.btnExit.TabIndex = 5;
@@ -96,6 +125,7 @@ namespace LaberintoInteractivo
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 600);
             this.Controls.Add(this.btnExit);
+            this.Controls.Add(this.btnMods);
             this.Controls.Add(this.btnPlayHardcore);
             this.Controls.Add(this.btnPlayCampaign);
             this.Controls.Add(this.pbAvatarPreview);
@@ -104,6 +134,7 @@ namespace LaberintoInteractivo
             this.Name = "FormMenu";
             this.Text = "Menú Principal - Mazmorras del Estudio";
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatarPreview)).EndInit();
+            this.contextMenuStripMods.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -114,7 +145,10 @@ namespace LaberintoInteractivo
         private System.Windows.Forms.PictureBox pbAvatarPreview;
         private System.Windows.Forms.Button btnPlayCampaign;
         private System.Windows.Forms.Button btnPlayHardcore;
+        private System.Windows.Forms.Button btnMods;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripMods;
+        private System.Windows.Forms.ToolStripMenuItem donPolloToolStripMenuItem;
     }
 }

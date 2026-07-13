@@ -9,6 +9,7 @@ namespace LaberintoInteractivo
         private GameManager _gameManager;
         private Image _avatarImage;
         private bool _isHardcore;
+        private bool _isDonPolloEnabled;
 
         // Configuraciones visuales (Fallback)
         private readonly Color _wallColor = Color.FromArgb(15, 15, 15);
@@ -29,11 +30,26 @@ namespace LaberintoInteractivo
         // Optimización de Renderizado (UI manejada nativamente por WinForms Image)
         // Eliminado _mapBuffer manual
 
-        public FormJuego(Image avatar, bool isHardcore)
+        [System.Runtime.InteropServices.DllImport("winmm.dll")]
+        private static extern long mciSendString(string command, System.Text.StringBuilder returnValue, int returnLength, IntPtr winHandle);
+
+        private void UpdateMusicState()
+        {
+            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
+            if (_gameManager != null && _gameManager.BossActive && _isDonPolloEnabled)
+            {
+                string chaseAudioPath = System.IO.Path.GetFullPath(@"Assets\don-pollo-king.mp3");
+                mciSendString($"open \"{chaseAudioPath}\" type mpegvideo alias chaseMusic", null, 0, IntPtr.Zero);
+                mciSendString("play chaseMusic repeat", null, 0, IntPtr.Zero);
+            }
+        }
+
+        public FormJuego(Image avatar, bool isHardcore, bool isDonPolloEnabled)
         {
             InitializeComponent();
             _avatarImage = avatar;
             _isHardcore = isHardcore;
+            _isDonPolloEnabled = isDonPolloEnabled;
             
             try
             {
@@ -42,13 +58,30 @@ namespace LaberintoInteractivo
                 _floorTexture = Image.FromFile(@"Assets\floor_texture.png");
                 _noteTexture = Image.FromFile(@"Assets\note_texture.png");
                 _exitTexture = Image.FromFile(@"Assets\exit_texture.png");
-                _bossTexture = Image.FromFile(@"Assets\boss_texture.png");
+                
                 _trapTexture = Image.FromFile(@"Assets\trap_texture.png");
                 _boostTexture = Image.FromFile(@"Assets\boost_texture.png");
             }
             catch (Exception)
             {
                 // Ignorar error si no están las imágenes (fallback a colores sólidos)
+            }
+            
+            if (_isDonPolloEnabled)
+            {
+                try
+                {
+                    _bossTexture = Image.FromFile(@"Assets\Don pollo perseguidor.jpg");
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                try
+                {
+                    _bossTexture = Image.FromFile(@"Assets\boss_texture.png");
+                }
+                catch (Exception) { }
             }
             
             _gameManager = new GameManager();
@@ -75,6 +108,12 @@ namespace LaberintoInteractivo
             this.KeyPreview = true;
             this.Focus();
             pbMaze.Invalidate();
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            UpdateMusicState();
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -299,6 +338,7 @@ namespace LaberintoInteractivo
             
             pbMaze.Invalidate(); 
             UpdateStats();
+            UpdateMusicState();
 
             // Esperar un poco para que la interfaz se redibuje completamente con el nuevo nivel
             await System.Threading.Tasks.Task.Delay(150); 
@@ -316,6 +356,7 @@ namespace LaberintoInteractivo
         private void GameManager_OnGameWon(bool gotAllStars)
         {
             gameTimer.Stop();
+            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
             this.Hide();
             
             using (FormHistoria outro = new FormHistoria(true, gotAllStars))
@@ -329,21 +370,48 @@ namespace LaberintoInteractivo
         private async void GameManager_OnGameOver()
         {
             gameTimer.Stop();
+            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
 
-            Form screamer = new Form();
-            screamer.FormBorderStyle = FormBorderStyle.None;
-            screamer.WindowState = FormWindowState.Maximized;
-            screamer.BackColor = Color.Black;
-            try {
-                screamer.BackgroundImage = Image.FromFile(@"Assets\screamer.png");
-                screamer.BackgroundImageLayout = ImageLayout.Zoom;
-            } catch {}
-            screamer.TopMost = true;
-            screamer.Show();
+            if (_isDonPolloEnabled)
+            {
+                string screamerAudioPath = System.IO.Path.GetFullPath(@"Assets\un-video-mas-mi-gente-para-perder-el-tiempo.mp3");
+                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+                mciSendString($"open \"{screamerAudioPath}\" type mpegvideo alias screamerMusic", null, 0, IntPtr.Zero);
+                mciSendString("setaudio screamerMusic volume to 1000", null, 0, IntPtr.Zero);
+                mciSendString("play screamerMusic", null, 0, IntPtr.Zero);
 
-            await System.Threading.Tasks.Task.Delay(1500);
-            
-            screamer.Close();
+                Form screamer = new Form();
+                screamer.FormBorderStyle = FormBorderStyle.None;
+                screamer.WindowState = FormWindowState.Maximized;
+                screamer.BackColor = Color.Black;
+                try {
+                    screamer.BackgroundImage = Image.FromFile(System.IO.Path.GetFullPath(@"Assets\don pollo screamer.jpg"));
+                    screamer.BackgroundImageLayout = ImageLayout.Zoom;
+                } catch {}
+                screamer.TopMost = true;
+                screamer.Show();
+
+                await System.Threading.Tasks.Task.Delay(5000);
+                
+                mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+                screamer.Close();
+            }
+            else
+            {
+                Form screamer = new Form();
+                screamer.FormBorderStyle = FormBorderStyle.None;
+                screamer.WindowState = FormWindowState.Maximized;
+                screamer.BackColor = Color.Black;
+                try {
+                    screamer.BackgroundImage = Image.FromFile(System.IO.Path.GetFullPath(@"Assets\screamer.png"));
+                    screamer.BackgroundImageLayout = ImageLayout.Zoom;
+                } catch {}
+                screamer.TopMost = true;
+                screamer.Show();
+
+                await System.Threading.Tasks.Task.Delay(3000);
+                screamer.Close();
+            }
 
             MessageBox.Show("¡El acosador te ha atrapado! Fin del juego.", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Error);
             this.Close(); // Regresará al menú
@@ -359,6 +427,13 @@ namespace LaberintoInteractivo
                 
                 pbMaze.Invalidate();
             }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            mciSendString("close chaseMusic", null, 0, IntPtr.Zero);
+            mciSendString("close screamerMusic", null, 0, IntPtr.Zero);
+            base.OnFormClosed(e);
         }
     }
 }

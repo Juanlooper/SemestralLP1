@@ -32,7 +32,16 @@ namespace LaberintoInteractivo
             StyleButton(btnLoadAvatar);
             StyleButton(btnPlayCampaign);
             StyleButton(btnPlayHardcore);
+            StyleButton(btnMods);
             StyleButton(btnExit);
+
+            // Estilizar el menú contextual de Mods
+            contextMenuStripMods.Renderer = new ToolStripProfessionalRenderer(new DarkMenuColorTable());
+            contextMenuStripMods.BackColor = Color.FromArgb(20, 20, 20);
+            contextMenuStripMods.ForeColor = Color.Gold;
+            
+            donPolloToolStripMenuItem.ForeColor = Color.Gold;
+            donPolloToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
         }
 
         private void StyleButton(Button btn)
@@ -99,15 +108,39 @@ namespace LaberintoInteractivo
                 return;
             }
 
-            FormJuego formJuego = new FormJuego(_avatarImage, isHardcore);
+            bool isDonPolloEnabled = donPolloToolStripMenuItem.Checked;
+
+            FormJuego formJuego = new FormJuego(_avatarImage, isHardcore, isDonPolloEnabled);
             formJuego.FormClosed += (s, args) => this.Show(); // Volver a mostrar el menú al cerrar el juego
             this.Hide();
             formJuego.Show();
+        }
+
+        private void btnMods_Click(object sender, EventArgs e)
+        {
+            contextMenuStripMods.Show(btnMods, new Point(0, btnMods.Height));
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
+    }
+
+    public class DarkMenuColorTable : ProfessionalColorTable
+    {
+        public override Color ToolStripDropDownBackground => Color.FromArgb(20, 20, 20);
+        public override Color ImageMarginGradientBegin => Color.FromArgb(20, 20, 20);
+        public override Color ImageMarginGradientMiddle => Color.FromArgb(20, 20, 20);
+        public override Color ImageMarginGradientEnd => Color.FromArgb(20, 20, 20);
+        public override Color MenuBorder => Color.DarkGoldenrod;
+        public override Color MenuItemBorder => Color.DarkGoldenrod;
+        public override Color MenuItemSelected => Color.FromArgb(50, 50, 50);
+        public override Color MenuItemSelectedGradientBegin => Color.FromArgb(50, 50, 50);
+        public override Color MenuItemSelectedGradientEnd => Color.FromArgb(50, 50, 50);
+        public override Color MenuItemPressedGradientBegin => Color.FromArgb(30, 30, 30);
+        public override Color MenuItemPressedGradientEnd => Color.FromArgb(30, 30, 30);
+        public override Color CheckBackground => Color.DarkGoldenrod;
+        public override Color CheckSelectedBackground => Color.Gold;
     }
 }
