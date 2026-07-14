@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Drawing;
 
@@ -28,6 +29,9 @@ namespace LaberintoInteractivo
         public int BossSpeedMultiplier { get; set; } = 1;
         public int BossSpeedBoostTurns { get; set; } = 0;
         public int PlayerSpeedBoostTurns { get; set; } = 0;
+        public bool IsBoostActive => BossSpeedBoostTurns > 0 || BossFreezeTurns > 0 || PlayerSpeedBoostTurns > 0;
+        public bool IsBadBoostActive => BossSpeedBoostTurns > 0;
+        public bool IsGoodBoostActive => BossFreezeTurns > 0 || PlayerSpeedBoostTurns > 0;
 
         public event Action<bool> OnLevelCompleted; // bool: got all stars
         public event Action<bool> OnGameWon; // bool: got all stars
@@ -183,6 +187,8 @@ namespace LaberintoInteractivo
                         CheckWinCondition();
                     }
                 }
+                
+                AudioPlayer.SetGlobalSpeed(IsBoostActive ? 1.25f : 1.0f);
             }
         }
 
