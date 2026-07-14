@@ -271,6 +271,17 @@ public FormHistoria(bool perfectEnding)
 
 ---
 
+## Conclusion
+El desarrollo de este "Laberinto Interactivo con Niveles" ha demostrado de manera práctica la importancia de comprender y aplicar correctamente las estructuras de datos, específicamente las matrices bidimensionales, en el diseño de entornos virtuales y videojuegos lógicos. Se logró cumplir con éxito todos los objetivos propuestos, integrando una interfaz gráfica intuitiva mediante Windows Forms, control de eventos en tiempo real y el uso de la Programación Orientada a Objetos para mantener un código limpio, modular y escalable. Además de los requisitos obligatorios, el equipo logró implementar mecánicas avanzadas como la inteligencia artificial del enemigo (Pathfinding) y efectos visuales inmersivos, lo cual enriquece notablemente la experiencia del usuario final. Este proyecto sirvió para consolidar nuestros conocimientos en C# y darnos una visión profunda de cómo se estructura la lógica detrás del software interactivo.
+
+## Referencias Bibliograficas
+1. Microsoft Corporation. (2023). *Documentación de C# y .NET*. Recuperado de https://learn.microsoft.com/es-es/dotnet/csharp/
+2. Microsoft Corporation. (2023). *Windows Forms Documentation*. Recuperado de https://learn.microsoft.com/es-es/dotnet/desktop/winforms/
+3. Albahari, J., & Albahari, B. (2022). *C# 10 in a Nutshell: The Definitive Reference*. O'Reilly Media.
+4. Freeman, A. (2020). *Pro C# 9 with .NET 5: Foundational Principles and Practices in Programming*. Apress.
+
+---
+
 ## Tecnologias y Entorno de Trabajo
 - Lenguaje: C#
 - Framework: .NET (Windows Forms)
