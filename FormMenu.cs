@@ -29,11 +29,21 @@ namespace LaberintoInteractivo
             // Hacer fondo del título transparente
             lblTitle.BackColor = Color.Transparent;
             
+            // Cargar avatar por defecto
+            try
+            {
+                _avatarImage = Image.FromFile(@"Assets\default_avatar.png");
+                pbAvatarPreview.Image = _avatarImage;
+                pbAvatarPreview.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+            catch (Exception) { /* Ignorar si no existe */ }
+            
             // Estilizar botones
             StyleButton(btnLoadAvatar);
             StyleButton(btnPlayCampaign);
             StyleButton(btnPlayHardcore);
             StyleButton(btnMods);
+            StyleButton(btnToggleMods);
             StyleButton(btnExit);
 
             // Estilizar el menú contextual de Mods
@@ -125,6 +135,15 @@ namespace LaberintoInteractivo
         private void btnMods_Click(object sender, EventArgs e)
         {
             contextMenuStripMods.Show(btnMods, new Point(0, btnMods.Height));
+        }
+
+        private void btnToggleMods_Click(object sender, EventArgs e)
+        {
+            btnMods.Visible = !btnMods.Visible;
+            if (btnMods.Visible)
+                btnToggleMods.Text = "Ocultar Mods";
+            else
+                btnToggleMods.Text = "Mostrar Mods";
         }
 
         private void donPolloToolStripMenuItem_Click(object sender, EventArgs e)

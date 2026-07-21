@@ -8,17 +8,20 @@
 
 ---
 
-## SECCION 1: Introduccion, Estructura de Datos y Diseño de Niveles
+## SECCION 1: Introducción, Estructura de Datos y Diseño de Niveles
 
-### Introduccion
-El presente proyecto, titulado "Laberinto Interactivo con Niveles", es una aplicación desarrollada en C# orientada a poner a prueba la lógica, el análisis y el razonamiento espacial del jugador. A través de este entorno interactivo, el usuario debe encontrar la salida de diferentes laberintos progresivamente más complejos, tomando decisiones bajo presión temporal. El proyecto fue concebido y programado haciendo uso de los pilares fundamentales de la algoritmia: estructuras de datos bidimensionales (matrices), estructuras de control, manejo avanzado de eventos y Programación Orientada a Objetos. 
+### Introducción
+El presente proyecto, titulado "Laberinto Interactivo con Niveles", es una aplicación desarrollada en el lenguaje C# bajo la plataforma .NET (Windows Forms), orientada a poner a prueba la lógica, el análisis y el razonamiento espacial del jugador. A través de este entorno interactivo, el usuario debe encontrar la salida de diferentes laberintos progresivamente más complejos, tomando decisiones bajo presión temporal y evitando obstáculos. 
 
-A continuación, se detalla cómo el sistema cumple de manera estricta con todos los requisitos, así como la implementación de funcionalidades adicionales.
+Este proyecto fue concebido y programado haciendo uso estricto de los pilares fundamentales de la algoritmia y programación estructurada: estructuras de datos bidimensionales (matrices), estructuras de control iterativas y condicionales, manejo avanzado de eventos y el paradigma de Programación Orientada a Objetos (POO). A lo largo de este documento, se detallará cómo el sistema cumple de manera íntegra con todos los requisitos solicitados, así como la implementación de funcionalidades adicionales que enriquecen la experiencia.
 
 ### Matriz [filas, columnas] y Manejo de Arreglos
-Explicación: El corazón del mapa reside en la clase `Level.cs`. Para representar la estructura del laberinto, se utiliza una matriz bidimensional (`int[,] Grid`). Este enfoque matricial permite que cada celda de la pantalla represente un valor numérico: `0` para caminos y `1` para paredes. El motor gráfico recorre esta matriz mediante ciclos `for` anidados para dibujar el entorno.
+**Explicación Detallada:** 
+El núcleo lógico del mapa reside en la clase `Level.cs`. Para representar la estructura física de cada laberinto, hemos implementado una matriz bidimensional (arreglo de dos dimensiones `int[,] Grid`). Este enfoque matricial es fundamental, ya que permite que cada celda de la pantalla represente un valor numérico específico: `0` para caminos transitables, `1` para paredes infranqueables, `2` para coleccionables, `3` para la salida, entre otros. 
 
-Evidencia de Código (Renderizado desde la Matriz en `FormJuego.cs`):
+El motor gráfico renderiza este entorno recorriendo la matriz de manera exhaustiva mediante ciclos `for` anidados. Al leer el valor de cada celda, la aplicación determina qué textura o color dibujar en las coordenadas correspondientes, asegurando un mapeo exacto entre la estructura de datos en memoria y la interfaz gráfica mostrada al usuario.
+
+**Evidencia de Código (Renderizado desde la Matriz en `FormJuego.cs`):**
 ```csharp
 private void pbMaze_Paint(object sender, PaintEventArgs e)
 {
@@ -39,13 +42,16 @@ private void pbMaze_Paint(object sender, PaintEventArgs e)
 }
 ```
 
-### Implementacion de al menos 3 Niveles (Dificultad Progresiva)
-Explicación: El programa incluye los 3 niveles obligatorios, aumentando en tamaño y obstáculos.
-- Nivel 1 (Laberinto pequeño): Matriz de 10x10. Se enfoca en enseñar controles mediante un panel gráfico de Tutorial.
-- Nivel 2 (Más obstáculos): Matriz de 15x15. Introduce rutas no lineales.
-- Nivel 3 (Caminos engañosos): Matriz gigante de 20x20 llena de callejones sin salida.
+### Implementación de al menos 3 Niveles (Dificultad Progresiva)
+**Explicación Detallada:** 
+El programa incluye los 3 niveles obligatorios con un diseño pensado en la curva de aprendizaje del jugador, aumentando progresivamente en tamaño, complejidad y cantidad de obstáculos.
+- **Nivel 1 (Fase Tutorial):** Representado por una matriz de 10x10. Se enfoca en enseñar los controles básicos al jugador mediante un panel gráfico de Tutorial y un entorno con un recorrido directo.
+- **Nivel 2 (Desafío Intermedio):** Matriz ampliada de 15x15. Introduce rutas no lineales, bifurcaciones y una mayor cantidad de elementos a recolectar.
+- **Nivel 3 (Laberinto Complejo):** Matriz gigante de 20x20. Se caracteriza por múltiples callejones sin salida y caminos engañosos que desafían la memoria espacial del usuario.
 
-Evidencia de Código (Construcción del Nivel 1 y 2 en `Level.cs`):
+Cada nivel se carga dinámicamente instanciando un nuevo mapa dentro de nuestra clase manejadora.
+
+**Evidencia de Código (Construcción del Nivel 1 y 2 en `Level.cs`):**
 ```csharp
 switch (levelNumber)
 {
@@ -83,17 +89,18 @@ switch (levelNumber)
 
 ---
 
-## SECCION 2: Interfaz Grafica, Controles y Manejo de Eventos
+## SECCION 2: Interfaz Gráfica, Controles y Manejo de Eventos
 
 ### Personaje que se mueve con el teclado (y botones)
-Explicación: Se implementó una interfaz gráfica mediante Windows Forms que detecta interacciones en tiempo real. Mediante la sobreescritura del método `ProcessCmdKey`, la aplicación captura las flechas del teclado (y W,A,S,D) e invoca la lógica de movimiento. Se incluyeron además botones visuales clickeables.
+**Explicación Detallada:** 
+La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva mediante Windows Forms, configurada para detectar pulsaciones en tiempo real. Sobreescribiendo el método nativo `ProcessCmdKey`, la aplicación es capaz de capturar eficientemente las teclas de dirección (Flechas y W,A,S,D) antes de que el formulario las procese de manera predeterminada. Una vez detectada la tecla, se invoca inmediatamente la lógica de movimiento, calculando la nueva posición deseada. También se incluyeron botones visuales en pantalla para permitir la jugabilidad con el ratón o pantallas táctiles.
 
-Evidencia de Código (Eventos de Teclado en `FormJuego.cs`):
+**Evidencia de Código (Eventos de Teclado en `FormJuego.cs`):**
 ```csharp
 // Captura de eventos del teclado en tiempo real
 protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 {
-    if (_isPaused) return base.ProcessCmdKey(ref msg, keyData); // Validación de estado
+    if (_isPaused) return base.ProcessCmdKey(ref msg, keyData); // Validación de estado de pausa
 
     if (_gameManager.CurrentLevel != null)
     {
@@ -109,10 +116,11 @@ protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 }
 ```
 
-### Mostrar Tiempo y Numero de Pasos (Estadisticas)
-Explicación: Se actualiza una etiqueta en la interfaz visual (`Label`) combinando las propiedades numéricas del cronómetro y los contadores en cada turno o segundo transcurrido.
+### Mostrar Tiempo y Número de Pasos (Estadísticas en Tiempo Real)
+**Explicación Detallada:** 
+Mantener al jugador informado de su progreso es crucial para la experiencia de juego. Por ello, se implementó un sistema de actualización de estadísticas que combina las propiedades del temporizador (`Timer` tick) y variables de estado internas. Cada segundo, o cada vez que el jugador da un paso, se actualizan las etiquetas (`Label`) de la interfaz, concatenando cadenas de texto (`string interpolation`) con el nivel actual, elementos recolectados, pasos totales y tiempo en segundos.
 
-Evidencia de Código (`FormJuego.cs`):
+**Evidencia de Código (`FormJuego.cs`):**
 ```csharp
 private void gameTimer_Tick(object sender, EventArgs e)
 {
@@ -126,10 +134,11 @@ private void UpdateStats()
 }
 ```
 
-### Puntos de Inicio y Salida
-Explicación: Se requiere que cada laberinto tenga un punto donde nace el jugador y una meta. Se utilizaron variables tipo `Point` para guardar estas coordenadas lógicas. En cada movimiento, la POO permite a `GameManager` validar si el usuario llegó a la coordenada de salida.
+### Puntos de Inicio y Salida Estructurados
+**Explicación Detallada:** 
+Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo `Point` (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el `GameManager` valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.
 
-Evidencia de Código (`Level.cs` y `GameManager.cs`):
+**Evidencia de Código (`Level.cs` y `GameManager.cs`):**
 ```csharp
 // Constructor de Nivel (Level.cs)
 StartPosition = new Point(1, 1);
@@ -144,137 +153,157 @@ if (targetCell == 3) // La celda 3 representa la Salida en la matriz
 
 ---
 
-## SECCION 3: Logica Avanzada, Inteligencia Artificial y Mecanicas de Juego
+## SECCION 3: Lógica Avanzada, Inteligencia Artificial y Mecánicas de Juego
 
-### Recoleccion de Apuntes (Logica de Juego)
-Explicación: Se obliga al jugador a explorar buscando elementos coleccionables (representados por el número 2 en la matriz). 
-Evidencia de Código (`GameManager.cs`):
+### Recolección de Apuntes (Core Gameplay)
+**Explicación Detallada:** 
+Para evitar que el usuario se dirija únicamente a la salida, se añadieron objetos coleccionables esparcidos por el mapa (representados por el número 2 en la matriz lógica). Al colisionar con estas celdas, el sistema actualiza contadores internos y sobrescribe el valor de la matriz a 0 (camino vacío), haciendo desaparecer visual y lógicamente el objeto en el siguiente cuadro de renderizado.
+
+**Evidencia de Código (`GameManager.cs`):**
 ```csharp
 if (targetCell == 2) 
 {
-    StarsCollected++; // Registra la recolección
-    CurrentLevel.Grid[newY, newX] = 0; // Remueve el ítem volviéndolo camino vacío
+    StarsCollected++; // Registra la recolección en los datos del jugador
+    CurrentLevel.Grid[newY, newX] = 0; // Remueve el ítem volviéndolo camino vacío permanentemente
 }
 ```
 
-### Interacciones con Trampas y Potenciadores
-Explicación: El jugador pisa celdas trampa (`4`) que enojan al enemigo acelerándolo, o toma potenciadores (`5`) que congelan temporalmente al enemigo.
-Evidencia de Código (`GameManager.cs`):
+### Interacciones con Trampas y Potenciadores Dinámicos
+**Explicación Detallada:** 
+Elevando el desafío, se incluyeron celdas especiales: trampas ocultas (`4`) y potenciadores estratégicos (`5`). Pisar una trampa provoca una penalización directa (acelera al enemigo enojándolo), mientras que el potenciador otorga un respiro al jugador congelando las amenazas temporalmente. Esto requiere manipulación directa de propiedades del sistema (como modificar el `.Interval` de un temporizador).
+
+**Evidencia de Código (`GameManager.cs`):**
 ```csharp
 else if (targetCell == 4) // TRAMPA (Maldición)
 {
     CurrentLevel.Grid[newY, newX] = 0;
-    _enemyTimer.Interval = Math.Max(200, _enemyTimer.Interval - 100); // Acelera al enemigo
+    _enemyTimer.Interval = Math.Max(200, _enemyTimer.Interval - 100); // Acelera drásticamente al enemigo
 }
 else if (targetCell == 5) // POTENCIADOR (Boost)
 {
     CurrentLevel.Grid[newY, newX] = 0;
-    _enemyFrozenTime = 5; // Congela al enemigo 5 turnos
+    _enemyFrozenTime = 5; // Congela al enemigo durante 5 ciclos lógicos
 }
 ```
 
-### Enemigo Inteligente (Monstruo Acosador)
-Explicación: Un enemigo en constante movimiento utiliza algoritmos (como BFS) dentro de un `Timer` independiente para encontrar el camino al jugador esquivando las paredes de la matriz.
-Evidencia de Código (`GameManager.cs`):
+### Enemigo Inteligente (Inteligencia Artificial Básica)
+**Explicación Detallada:** 
+En los niveles superiores, un enemigo activo en el mapa busca alcanzar al jugador. Programado con un `Timer` asíncrono, evalúa continuamente las coordenadas del jugador y decide su siguiente movimiento para acortar la distancia, asegurándose de evitar paredes. Esta mecánica simula algoritmos de persecución (como BFS o evaluación heurística simple) e instaura un factor de estrés positivo.
+
+**Evidencia de Código (`GameManager.cs`):**
 ```csharp
 private void MoveEnemy()
 {
-    // ... Cálculo de posición buscando al jugador ...
-    // Choque mortal:
+    // ... Cálculo de posición buscando acortar la distancia X, Y con el jugador ...
+    
+    // Condición de Choque mortal (Game Over):
     if (EnemyPosition == new Point(Player1.X, Player1.Y))
     {
-        OnLevelCompleted?.Invoke(false); // Dispara Game Over
+        OnLevelCompleted?.Invoke(false); // Dispara el evento de fracaso
     }
 }
 ```
 
-### Niebla de Guerra y Nivel Oculto Hardcore
-Explicación: Hay una variable modo Hardcore. Si se activa, las zonas alejadas del jugador se pintan de negro calculando la distancia euclidiana. Adicionalmente desbloquea un Nivel 4 hiper complejo de 25x25.
-Evidencia de Código (`FormJuego.cs` y `Level.cs`):
+### Niebla de Guerra y Nivel Oculto (Modo Hardcore)
+**Explicación Detallada:** 
+Para jugadores veteranos, se implementó un modo "Hardcore". Activar este modo habilita un efecto de "Niebla de Guerra", donde solo un radio visible alrededor del jugador se dibuja de forma normal. Las celdas más allá de este límite (calculado mediante la fórmula de distancia euclidiana) se cubren de oscuridad (renderizadas en negro). Superar el juego en estas condiciones desbloquea un masivo Nivel 4 de 25x25.
+
+**Evidencia de Código (`FormJuego.cs` y `Level.cs`):**
 ```csharp
-// NIEBLA DE GUERRA EN FORM JUEGO
+// NIEBLA DE GUERRA EN EVENTO PAINT DE FORM JUEGO
 if (_isHardcore)
 {
-    // Teorema de pitágoras: Distancia geométrica al jugador
+    // Teorema de Pitágoras: Cálculo de Distancia geométrica del jugador a la celda a dibujar
     double distance = Math.Sqrt(Math.Pow(x - _gameManager.Player1.X, 2) + Math.Pow(y - _gameManager.Player1.Y, 2));
     if (distance > FogRadius)
     {
-        e.Graphics.FillRectangle(Brushes.Black, rect); // Ciega al usuario
+        e.Graphics.FillRectangle(Brushes.Black, rect); // Ciega al usuario dibujando un cuadro negro sobre la textura
     }
 }
 
 // NIVEL 4 OCULTO EN LEVEL.CS
 case 4:
-    Grid = new int[25, 25] { /* ... */ }; // Matriz inmensa
+    Grid = new int[25, 25] { /* ... Matriz inmensa omitida ... */ }; 
     TotalStars = 8;
     break;
 ```
 
 ---
 
-## SECCION 4: Multimedia, Personalizacion y Finales Multiples
+## SECCION 4: Multimedia, Personalización y Finales Múltiples
 
-### Subida de Avatar Personalizado (Pantalla de Menu)
-Explicación: En la pantalla `FormMenu`, el jugador no está limitado a un ícono fijo. Puede importar imágenes en formato JPG/PNG desde su PC y jugar con ellas.
-Evidencia de Código (`FormMenu.cs`):
+### Subida de Avatar Personalizado (Gestión de Archivos Locales)
+**Explicación Detallada:** 
+Se le otorga identidad al jugador permitiendo personalizar su representación visual. Mediante el uso de componentes del sistema operativo (`OpenFileDialog`), el software permite navegar por el disco duro del usuario, aplicar filtros de extensión (`.png`, `.jpg`) y cargar un archivo gráfico a la memoria RAM de la aplicación, utilizándolo dinámicamente durante el juego.
+
+**Evidencia de Código (`FormMenu.cs`):**
 ```csharp
 private void btnUploadAvatar_Click(object sender, EventArgs e)
 {
     using (OpenFileDialog ofd = new OpenFileDialog())
     {
-        ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+        ofd.Filter = "Archivos de Imagen|*.jpg;*.jpeg;*.png;*.bmp";
         if (ofd.ShowDialog() == DialogResult.OK)
         {
-            _avatarImage = Image.FromFile(ofd.FileName); // Carga la imagen local
-            pbAvatar.Image = _avatarImage; 
+            _avatarImage = Image.FromFile(ofd.FileName); // Carga la imagen local en un objeto Image
+            pbAvatar.Image = _avatarImage; // Actualiza la vista previa en el menú
         }
     }
 }
 ```
 
-### Texturas y Efecto Visual Pulsante (Pantalla de Juego)
-Explicación: En lugar de colores sólidos, dibujamos imágenes que se escalan dinámicamente. La meta incluye una lógica matemática senoidal para contraerse y expandirse (Glow effect).
-Evidencia de Código (`FormJuego.cs`):
+### Texturas y Efecto Visual Pulsante (Renderizado Dinámico)
+**Explicación Detallada:** 
+Rompiendo con la monotonía de cuadros estáticos, la casilla de salida emplea un cálculo senoidal para crear una ilusión óptica de pulsación (Glow Effect). Esto se logra alterando las dimensiones de la imagen (escalado) en el método de dibujo, creando dinamismo visual sin la necesidad de usar costosos motores de render 3D.
+
+**Evidencia de Código (`FormJuego.cs`):**
 ```csharp
-// Escalado de la salida (Meta) con un efecto tipo 'Glow'
+// Escalado de la salida (Meta) con un efecto tipo 'Glow' animado por tiempo
 int targetSize = (int)(CellSize * _glowScale);
-int offset = (CellSize - targetSize) / 2;
+int offset = (CellSize - targetSize) / 2; // Centrado matemático del rectángulo escalado
 Rectangle targetRect = new Rectangle(x * CellSize + offset, y * CellSize + offset, targetSize, targetSize);
-e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la textura animada
+e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la textura animada en pantalla
 ```
 
-### Sistema de Audio y Banda Sonora
-Explicación: Implementación nativa de `System.Media.SoundPlayer` para música de fondo en los niveles y efectos de terror en situaciones críticas.
-Evidencia de Código (`AudioPlayer.cs`):
+### Sistema de Audio Integrado
+**Explicación Detallada:** 
+La inmersión se consolida con el aspecto sonoro. Utilizando la clase nativa `System.Media.SoundPlayer`, se implementó música de fondo y efectos especiales que responden a los eventos del juego, mejorando significativamente el feedback auditivo provisto al jugador.
+
+**Evidencia de Código (`AudioPlayer.cs`):**
 ```csharp
 public void PlayMusic()
 {
     _musicPlayer.Stream = Properties.Resources.scary_music;
-    _musicPlayer.PlayLooping();
+    _musicPlayer.PlayLooping(); // Ejecuta la pista en repetición infinita en un hilo secundario
 }
 ```
 
-### Pantallas de Historia y Finales Multiples (`FormHistoria`)
-Explicación: Se añadió una pantalla cinemática al final. Revisa el estado de la partida terminada (Si el jugador logró reunir el 100% de apuntes) y carga un final "Perfecto" o un final "Normal" alentando la rejugabilidad.
-Evidencia de Código (`FormHistoria.cs`):
+### Pantallas de Historia y Múltiples Desenlaces (`FormHistoria`)
+**Explicación Detallada:** 
+Añadiendo una capa narrativa al proyecto, el juego evalúa el estado del jugador al concluir los niveles. Si el sistema detecta que el jugador recogió el 100% de los elementos disponibles, instancia el formulario de conclusión enviando un parámetro booleano de éxito total (`perfectEnding = true`), desencadenando un mensaje de victoria óptima. De lo contrario, desencadena un final alternativo.
+
+**Evidencia de Código (`FormHistoria.cs`):**
 ```csharp
 public FormHistoria(bool perfectEnding)
 {
     InitializeComponent();
     
+    // Decisión narrativa basada en el parámetro pasado al constructor
     if (perfectEnding)
-        txtStory.Text = "¡Felicidades! Lograste encontrar todos los apuntes perdidos...";
+        txtStory.Text = "¡Felicidades! Lograste encontrar todos los apuntes perdidos, tu semestre está salvado.";
     else
-        txtStory.Text = "Lograste escapar con vida, pero te faltaron apuntes de clase por recuperar...";
+        txtStory.Text = "Lograste escapar con vida, pero te faltaron apuntes de clase por recuperar. Tendrás que esforzarte más en el examen.";
 }
 ```
 
 ---
 
-## Conclusion
-El desarrollo de este "Laberinto Interactivo con Niveles" ha demostrado de manera práctica la importancia de comprender y aplicar correctamente las estructuras de datos, específicamente las matrices bidimensionales, en el diseño de entornos virtuales y videojuegos lógicos. Se logró cumplir con éxito todos los objetivos propuestos, integrando una interfaz gráfica intuitiva mediante Windows Forms, control de eventos en tiempo real y el uso de la Programación Orientada a Objetos para mantener un código limpio, modular y escalable. Además de los requisitos obligatorios, el equipo logró implementar mecánicas avanzadas como la inteligencia artificial del enemigo (Pathfinding) y efectos visuales inmersivos, lo cual enriquece notablemente la experiencia del usuario final. Este proyecto sirvió para consolidar nuestros conocimientos en C# y darnos una visión profunda de cómo se estructura la lógica detrás del software interactivo.
+## Conclusión
+El desarrollo e iteración de este "Laberinto Interactivo con Niveles" ha demostrado de manera práctica y tangible la importancia de comprender y aplicar correctamente las estructuras de datos, específicamente las matrices bidimensionales, en el diseño de entornos virtuales lógicos. Se logró cumplir con éxito rotundo todos los objetivos y requerimientos propuestos, integrando una interfaz gráfica intuitiva mediante Windows Forms, control fluido de eventos del teclado en tiempo real y el uso avanzado de la Programación Orientada a Objetos para mantener un código limpio, modular y altamente escalable. 
 
-## Referencias Bibliograficas
+Además de satisfacer los requisitos obligatorios, nuestro equipo invirtió el esfuerzo adicional para implementar mecánicas avanzadas como la inteligencia artificial del enemigo (búsqueda de ruta), efectos visuales inmersivos (niebla de guerra y animaciones pulsantes) y sistemas multimedia (audio e imágenes locales). Todo ello enriquece notablemente la experiencia del usuario final y le otorga al proyecto un acabado profesional. Este desafío sirvió no solo para consolidar nuestros conocimientos en la sintaxis de C#, sino también para ofrecernos una visión profunda y enriquecedora sobre cómo se estructura integralmente la lógica de software interactivo.
+
+## Referencias Bibliográficas
 1. Microsoft Corporation. (2023). *Documentación de C# y .NET*. Recuperado de https://learn.microsoft.com/es-es/dotnet/csharp/
 2. Microsoft Corporation. (2023). *Windows Forms Documentation*. Recuperado de https://learn.microsoft.com/es-es/dotnet/desktop/winforms/
 3. Albahari, J., & Albahari, B. (2022). *C# 10 in a Nutshell: The Definitive Reference*. O'Reilly Media.
@@ -282,7 +311,8 @@ El desarrollo de este "Laberinto Interactivo con Niveles" ha demostrado de maner
 
 ---
 
-## Tecnologias y Entorno de Trabajo
-- Lenguaje: C#
-- Framework: .NET (Windows Forms)
-- IDE: Visual Studio / Entorno de desarrollo de C#
+## Tecnologías y Entorno de Trabajo
+- **Lenguaje:** C# 12.0
+- **Framework:** .NET 8.0 (Windows Forms)
+- **IDE:** Visual Studio 2022
+- **Arquitectura:** POO, Programación Basada en Eventos

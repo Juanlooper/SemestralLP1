@@ -23,6 +23,7 @@ namespace LaberintoInteractivo
             this.btnPlayHardcore = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
+            this.btnToggleMods = new System.Windows.Forms.Button();
             this.contextMenuStripMods = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.donPolloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mod2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,7 +51,7 @@ namespace LaberintoInteractivo
             this.btnLoadAvatar.Name = "btnLoadAvatar";
             this.btnLoadAvatar.Size = new System.Drawing.Size(200, 50);
             this.btnLoadAvatar.TabIndex = 1;
-            this.btnLoadAvatar.Text = "Seleccionar Avatar";
+            this.btnLoadAvatar.Text = "Cambiar Avatar";
             this.btnLoadAvatar.UseVisualStyleBackColor = true;
             this.btnLoadAvatar.Click += new System.EventHandler(this.btnLoadAvatar_Click);
             // 
@@ -66,7 +67,7 @@ namespace LaberintoInteractivo
             // 
             // btnPlayCampaign
             // 
-            this.btnPlayCampaign.Enabled = false;
+            this.btnPlayCampaign.Enabled = true;
             this.btnPlayCampaign.Location = new System.Drawing.Point(50, 250);
             this.btnPlayCampaign.Name = "btnPlayCampaign";
             this.btnPlayCampaign.Size = new System.Drawing.Size(330, 50);
@@ -77,7 +78,7 @@ namespace LaberintoInteractivo
             // 
             // btnPlayHardcore
             // 
-            this.btnPlayHardcore.Enabled = false;
+            this.btnPlayHardcore.Enabled = true;
             this.btnPlayHardcore.Location = new System.Drawing.Point(50, 320);
             this.btnPlayHardcore.Name = "btnPlayHardcore";
             this.btnPlayHardcore.Size = new System.Drawing.Size(330, 50);
@@ -130,11 +131,22 @@ namespace LaberintoInteractivo
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // btnToggleMods
+            // 
+            this.btnToggleMods.Location = new System.Drawing.Point(400, 390);
+            this.btnToggleMods.Name = "btnToggleMods";
+            this.btnToggleMods.Size = new System.Drawing.Size(150, 50);
+            this.btnToggleMods.TabIndex = 7;
+            this.btnToggleMods.Text = "Ocultar Mods";
+            this.btnToggleMods.UseVisualStyleBackColor = true;
+            this.btnToggleMods.Click += new System.EventHandler(this.btnToggleMods_Click);
+            // 
             // FormMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.btnToggleMods);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnMods);
             this.Controls.Add(this.btnPlayHardcore);
@@ -158,6 +170,7 @@ namespace LaberintoInteractivo
         private System.Windows.Forms.Button btnPlayHardcore;
         private System.Windows.Forms.Button btnMods;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Button btnToggleMods;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripMods;
         private System.Windows.Forms.ToolStripMenuItem donPolloToolStripMenuItem;
