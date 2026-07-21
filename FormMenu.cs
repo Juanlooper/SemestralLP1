@@ -42,20 +42,7 @@ namespace LaberintoInteractivo
             StyleButton(btnLoadAvatar);
             StyleButton(btnPlayCampaign);
             StyleButton(btnPlayHardcore);
-            StyleButton(btnMods);
-            StyleButton(btnToggleMods);
             StyleButton(btnExit);
-
-            // Estilizar el menú contextual de Mods
-            contextMenuStripMods.Renderer = new ToolStripProfessionalRenderer(new DarkMenuColorTable());
-            contextMenuStripMods.BackColor = Color.FromArgb(20, 20, 20);
-            contextMenuStripMods.ForeColor = Color.Gold;
-            
-            donPolloToolStripMenuItem.ForeColor = Color.Gold;
-            donPolloToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            
-            mod2ToolStripMenuItem.ForeColor = Color.Gold;
-            mod2ToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
         }
 
         private void StyleButton(Button btn)
@@ -123,8 +110,6 @@ namespace LaberintoInteractivo
             }
 
             int activeMod = 0;
-            if (donPolloToolStripMenuItem.Checked) activeMod = 1;
-            else if (mod2ToolStripMenuItem.Checked) activeMod = 2;
 
             FormJuego formJuego = new FormJuego(_avatarImage, isHardcore, activeMod);
             formJuego.FormClosed += (s, args) => this.Show(); // Volver a mostrar el menú al cerrar el juego
@@ -132,35 +117,7 @@ namespace LaberintoInteractivo
             formJuego.Show();
         }
 
-        private void btnMods_Click(object sender, EventArgs e)
-        {
-            contextMenuStripMods.Show(btnMods, new Point(0, btnMods.Height));
-        }
 
-        private void btnToggleMods_Click(object sender, EventArgs e)
-        {
-            btnMods.Visible = !btnMods.Visible;
-            if (btnMods.Visible)
-                btnToggleMods.Text = "Ocultar Mods";
-            else
-                btnToggleMods.Text = "Mostrar Mods";
-        }
-
-        private void donPolloToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (donPolloToolStripMenuItem.Checked)
-            {
-                mod2ToolStripMenuItem.Checked = false;
-            }
-        }
-
-        private void mod2ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (mod2ToolStripMenuItem.Checked)
-            {
-                donPolloToolStripMenuItem.Checked = false;
-            }
-        }
 
         private void btnExit_Click(object sender, EventArgs e)
         {

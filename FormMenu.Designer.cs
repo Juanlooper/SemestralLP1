@@ -22,14 +22,8 @@ namespace LaberintoInteractivo
             this.btnPlayCampaign = new System.Windows.Forms.Button();
             this.btnPlayHardcore = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
-            this.btnMods = new System.Windows.Forms.Button();
-            this.btnToggleMods = new System.Windows.Forms.Button();
-            this.contextMenuStripMods = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.donPolloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mod2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatarPreview)).BeginInit();
-            this.contextMenuStripMods.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblTitle
@@ -86,69 +80,25 @@ namespace LaberintoInteractivo
             this.btnPlayHardcore.Text = "Niveles Hardcore (Niebla)";
             this.btnPlayHardcore.UseVisualStyleBackColor = true;
             this.btnPlayHardcore.Click += new System.EventHandler(this.btnPlayHardcore_Click);
-            // 
-            // btnMods
-            // 
-            this.btnMods.Location = new System.Drawing.Point(50, 390);
-            this.btnMods.Name = "btnMods";
-            this.btnMods.Size = new System.Drawing.Size(330, 50);
-            this.btnMods.TabIndex = 6;
-            this.btnMods.Text = "Mods";
-            this.btnMods.UseVisualStyleBackColor = true;
-            this.btnMods.Click += new System.EventHandler(this.btnMods_Click);
-            // 
-            // contextMenuStripMods
-            // 
-            this.contextMenuStripMods.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.donPolloToolStripMenuItem,
-            this.mod2ToolStripMenuItem});
-            this.contextMenuStripMods.Name = "contextMenuStripMods";
-            this.contextMenuStripMods.Size = new System.Drawing.Size(129, 48);
-            // 
-            // donPolloToolStripMenuItem
-            // 
-            this.donPolloToolStripMenuItem.CheckOnClick = true;
-            this.donPolloToolStripMenuItem.Name = "donPolloToolStripMenuItem";
-            this.donPolloToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.donPolloToolStripMenuItem.Text = "Don Pollo";
-            this.donPolloToolStripMenuItem.Click += new System.EventHandler(this.donPolloToolStripMenuItem_Click);
-            // 
-            // mod2ToolStripMenuItem
-            // 
-            this.mod2ToolStripMenuItem.CheckOnClick = true;
-            this.mod2ToolStripMenuItem.Name = "mod2ToolStripMenuItem";
-            this.mod2ToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.mod2ToolStripMenuItem.Text = "Mod 2";
-            this.mod2ToolStripMenuItem.Click += new System.EventHandler(this.mod2ToolStripMenuItem_Click);
+
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(50, 460);
+            this.btnExit.Location = new System.Drawing.Point(50, 390);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(330, 50);
             this.btnExit.TabIndex = 5;
             this.btnExit.Text = "Abandonar (Salir)";
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
-            // 
-            // btnToggleMods
-            // 
-            this.btnToggleMods.Location = new System.Drawing.Point(400, 390);
-            this.btnToggleMods.Name = "btnToggleMods";
-            this.btnToggleMods.Size = new System.Drawing.Size(150, 50);
-            this.btnToggleMods.TabIndex = 7;
-            this.btnToggleMods.Text = "Ocultar Mods";
-            this.btnToggleMods.UseVisualStyleBackColor = true;
-            this.btnToggleMods.Click += new System.EventHandler(this.btnToggleMods_Click);
+
             // 
             // FormMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 600);
-            this.Controls.Add(this.btnToggleMods);
             this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.btnMods);
             this.Controls.Add(this.btnPlayHardcore);
             this.Controls.Add(this.btnPlayCampaign);
             this.Controls.Add(this.pbAvatarPreview);
@@ -157,7 +107,6 @@ namespace LaberintoInteractivo
             this.Name = "FormMenu";
             this.Text = "Menú Principal - Mazmorras del Estudio";
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatarPreview)).EndInit();
-            this.contextMenuStripMods.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -168,12 +117,7 @@ namespace LaberintoInteractivo
         private System.Windows.Forms.PictureBox pbAvatarPreview;
         private System.Windows.Forms.Button btnPlayCampaign;
         private System.Windows.Forms.Button btnPlayHardcore;
-        private System.Windows.Forms.Button btnMods;
         private System.Windows.Forms.Button btnExit;
-        private System.Windows.Forms.Button btnToggleMods;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStripMods;
-        private System.Windows.Forms.ToolStripMenuItem donPolloToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem mod2ToolStripMenuItem;
     }
 }
