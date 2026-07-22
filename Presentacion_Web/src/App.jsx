@@ -1095,8 +1095,14 @@ if (_isHardcore && playerPos.X != -1)
             for (int x = 0; x < cols; x++)
             {
                 // Fórmula de distancia para medir cercanía al jugador
-        if (targetCell != 1) 
-        {
+                int distX = Math.Abs(playerPos.X - x);
+                int distY = Math.Abs(playerPos.Y - y);
+                if (Math.Max(distX, distY) > 2)
+                {
+                    RectangleF rect = new RectangleF(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+                    g.FillRectangle(fogBrush, rect); // Ciega la vista
+                }
+            }
         }
     }
 }`}</code></pre>
