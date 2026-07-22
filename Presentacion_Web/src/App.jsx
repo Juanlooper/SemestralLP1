@@ -686,15 +686,45 @@ function Section3Wrapper({ slide }) {
 // ----------------------------------------------------
 
 function TitleVisualizer() {
+  const [player, setPlayer] = useState({x:1, y:1});
+  useEffect(() => {
+    const path = [
+       {x:1,y:1}, {x:2,y:1}, {x:3,y:1}, {x:3,y:2}, {x:3,y:3}, {x:4,y:3}, {x:5,y:3}, {x:6,y:3}, {x:6,y:4}, {x:6,y:5}, {x:5,y:5}, {x:4,y:5}, {x:3,y:5}, {x:2,y:5}, {x:1,y:5}, {x:1,y:4}, {x:1,y:3}, {x:1,y:2}
+    ];
+    let step = 0;
+    const int = setInterval(() => {
+       step = (step + 1) % path.length;
+       setPlayer(path[step]);
+    }, 400);
+    return () => clearInterval(int);
+  }, []);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 1s ease' }}>
-      <div style={{ position: 'relative', width: '200px', height: '200px', animation: 'float-boss 3s ease-in-out infinite' }}>
-        <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(0, 255, 255, 0.5))' }} />
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', minHeight: '350px', animation: 'fadeIn 1s ease', position: 'relative', overflow: 'hidden' }}>
+      
+      {/* Grid Animado de Fondo */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 30px)', gap: '3px', position: 'absolute', opacity: 0.4, transform: 'perspective(500px) rotateX(20deg)' }}>
+        {Array.from({ length: 64 }).map((_, i) => {
+          const x = i % 8; const y = Math.floor(i / 8);
+          const isPlayer = player.x === x && player.y === y;
+          const isBoss = x === 6 && y === 1;
+          const isPath = (x > 0 && x < 7 && y > 0 && y < 6);
+          return (
+            <div key={i} style={{ width: '30px', height: '30px', backgroundColor: isPlayer ? '#00f' : isBoss ? '#f00' : isPath ? '#111' : '#333', borderRadius: isPlayer || isBoss ? '50%' : '2px', transition: 'all 0.2s ease', boxShadow: isPlayer ? '0 0 15px #00f' : isBoss ? '0 0 15px #f00' : 'none' }}></div>
+          )
+        })}
       </div>
-      <h2 style={{ marginTop: '20px', color: '#fff', textShadow: '0 0 10px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '5px' }}>PRESS START</h2>
+
+      <div style={{ zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(0, 255, 255, 0.3)' }}>
+        <div style={{ position: 'relative', width: '180px', height: '180px', animation: 'float-boss 3s ease-in-out infinite' }}>
+          <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 30px rgba(0, 255, 255, 0.8))' }} />
+        </div>
+        <h2 style={{ marginTop: '20px', color: '#fff', textShadow: '0 0 15px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '6px' }}>PRESS START</h2>
+      </div>
+
       <style>{`
-         @keyframes float-boss { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
-         @keyframes pulse-text-fast { 0% { opacity: 0.3; text-shadow: 0 0 5px #00ffff; } 100% { opacity: 1; text-shadow: 0 0 20px #00ffff; } }
+         @keyframes float-boss { 0% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-15px) scale(1.05); } 100% { transform: translateY(0px) scale(1); } }
+         @keyframes pulse-text-fast { 0% { opacity: 0.4; text-shadow: 0 0 5px #00ffff; } 100% { opacity: 1; text-shadow: 0 0 25px #00ffff; } }
        `}</style>
     </div>
   );
@@ -718,34 +748,65 @@ function Section0Wrapper({ slide }) {
 function ConclusionVisualizer() {
   const [particles, setParticles] = useState([]);
   useEffect(() => {
-    const arr = Array.from({ length: 40 }).map((_, i) => ({
+    const arr = Array.from({ length: 60 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      delay: Math.random() * 3,
-      color: ['#ff0055', '#00ffff', '#00ff00', '#ffcc00'][Math.floor(Math.random() * 4)]
+      delay: Math.random() * 2,
+      color: ['#ff0055', '#00ffff', '#00ff00', '#ffcc00', '#ff00ff'][Math.floor(Math.random() * 5)]
     }));
     setParticles(arr);
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', minHeight: '300px', justifyContent: 'center', position: 'relative', overflow: 'hidden', animation: 'fadeIn 1s ease' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', minHeight: '350px', justifyContent: 'center', position: 'relative', overflow: 'hidden', animation: 'fadeIn 1s ease', perspective: '1000px' }}>
+      
+      {/* Background Space Effect */}
+      <div style={{ position: 'absolute', width: '100%', height: '100%', background: 'radial-gradient(ellipse at center, #1b2735 0%, #090a0f 100%)', zIndex: 0 }}></div>
+
       {particles.map(p => (
         <div key={p.id} style={{
-          position: 'absolute', left: `${p.x}%`, top: `${p.y}%`, width: '10px', height: '10px', backgroundColor: p.color, borderRadius: '2px',
-          animation: `confetti 3s ease-in infinite ${p.delay}s`, opacity: 0
+          position: 'absolute', left: `${p.x}%`, top: `${p.y}%`, width: '8px', height: '8px', backgroundColor: p.color, borderRadius: '50%',
+          animation: `firework 2.5s ease-out infinite ${p.delay}s`, opacity: 0, zIndex: 1, boxShadow: `0 0 15px ${p.color}`
         }}></div>
       ))}
-      <div style={{ zIndex: 10, backgroundColor: 'rgba(0,0,0,0.8)', padding: '40px', borderRadius: '20px', border: '3px solid #ffcc00', textAlign: 'center', boxShadow: '0 0 30px rgba(255, 204, 0, 0.5)' }}>
-        <h2 style={{ color: '#ffcc00', fontSize: '4rem', margin: 0, animation: 'pulse-glow 1.5s infinite alternate', textShadow: '3px 3px 0 #000' }}>FIN</h2>
-        <p style={{ color: '#fff', marginTop: '15px', fontSize: '1.5rem', fontWeight: 'bold' }}>¡Gracias por su atención!</p>
+
+      {/* Credits Scroll */}
+      <div style={{ position: 'absolute', bottom: '-200px', width: '100%', textAlign: 'center', animation: 'scroll-credits 12s linear infinite', zIndex: 2, color: '#a0d4ff', fontFamily: 'monospace', fontSize: '14px', textShadow: '1px 1px 2px #000', opacity: 0.6 }}>
+         <p style={{ margin: '8px 0' }}>DIRECTOR: Juan Rodríguez</p>
+         <p style={{ margin: '8px 0' }}>LEAD PROGRAMMER: Miguel Oliver</p>
+         <p style={{ margin: '8px 0' }}>AI ENGINEER: Nieves Pérez</p>
+         <p style={{ margin: '8px 0' }}>AUDIOVISUAL ARTS: Alejandra Falcón</p>
+         <p style={{ margin: '8px 0', marginTop: '20px', color: '#ffcc00' }}>SPECIAL THANKS: Profesor de Algoritmia</p>
+      </div>
+
+      <div style={{ zIndex: 10, backgroundColor: 'rgba(0,0,0,0.85)', padding: '40px 50px', borderRadius: '15px', border: '3px solid #ffcc00', textAlign: 'center', boxShadow: '0 0 50px rgba(255, 204, 0, 0.4)', transformStyle: 'preserve-3d', animation: 'float-card 4s ease-in-out infinite' }}>
+        <h2 style={{ color: '#ffcc00', fontSize: '3.5rem', margin: 0, animation: 'neon-glow 1.5s infinite alternate', fontFamily: 'Impact, sans-serif', letterSpacing: '2px', textShadow: '2px 2px 0 #000' }}>MISSION ACCOMPLISHED</h2>
+        <p style={{ color: '#fff', marginTop: '15px', fontSize: '1.5rem', fontWeight: 'bold' }}>¡Gracias por jugar!</p>
+        <p style={{ color: '#aaa', fontSize: '1.2rem', marginTop: '10px', fontFamily: 'monospace' }}>Rank: S | Score: 99999</p>
       </div>
       <style>{`
-         @keyframes confetti {
-           0% { transform: translateY(-150px) rotate(0deg); opacity: 1; }
-           100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+         @keyframes firework {
+           0% { transform: translateY(100px) scale(0); opacity: 1; }
+           50% { transform: translateY(-50px) scale(1.5); opacity: 1; }
+           100% { transform: translateY(-100px) scale(0) rotate(360deg); opacity: 0; }
          }
-       `}</style>
+         @keyframes scroll-credits {
+           0% { transform: translateY(0); opacity: 0; }
+           10% { opacity: 1; }
+           90% { opacity: 1; }
+           100% { transform: translateY(-400px); opacity: 0; }
+         }
+         @keyframes neon-glow {
+           0% { text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 20px #ff6600, 0 0 40px #ff6600; }
+           100% { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 40px #ffaa00, 0 0 80px #ffaa00; }
+         }
+         @keyframes float-card {
+           0% { transform: translateY(0) rotateX(5deg) rotateY(-5deg); }
+           50% { transform: translateY(-15px) rotateX(-5deg) rotateY(5deg); }
+           100% { transform: translateY(0) rotateX(5deg) rotateY(-5deg); }
+         }
+      `}</style>
     </div>
   );
 }
