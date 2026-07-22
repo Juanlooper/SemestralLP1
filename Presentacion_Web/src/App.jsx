@@ -248,6 +248,380 @@ function AnimatedFogVisualizer() {
   );
 }
 
+function IntroVisualizer1() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#a0d4ff', textShadow: '2px 2px 0 #000'}}>Generación de Laberinto</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 40px)', gap: '2px', backgroundColor: '#000', padding: '10px', border: '4px solid #a0d4ff', boxShadow: '0 0 15px rgba(0, 150, 255, 0.3)' }}>
+        {[1,1,1,1,1, 1,0,2,0,1, 1,0,1,0,1, 1,0,0,3,1, 1,1,1,1,1].map((c, i) => (
+          <div key={i} style={{ width: '40px', height: '40px', backgroundColor: c===1 ? '#666' : c===2 ? '#ffcc00' : c===3 ? '#00ff00' : '#222' }}></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MatrixVisualizerLevel() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const int = setInterval(() => setStep(s => (s + 1) % 3), 1500);
+    return () => clearInterval(int);
+  }, []);
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#ffcc00', textShadow: '2px 2px 0 #000'}}>Mapeo de Matriz a Textura</h3>
+      <div style={{ padding: '20px', backgroundColor: '#111', border: '2px solid #333', fontSize: '20px', fontFamily: 'monospace', color: '#fff', marginBottom: '20px', borderRadius: '5px' }}>
+        {step === 0 ? 'Grid[y, x] = 1;' : step === 1 ? 'Grid[y, x] = 2;' : 'Grid[y, x] = 0;'}
+      </div>
+      <div style={{ fontSize: '30px', margin: '10px', color: '#666' }}>↓</div>
+      <div style={{ width: '80px', height: '80px', backgroundColor: step === 0 ? '#666' : step === 1 ? '#ffcc00' : '#222', border: step === 0 ? 'none' : '2px dashed #444', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '16px', color: '#fff', borderRadius: '5px', boxShadow: step === 1 ? '0 0 10px #ffcc00' : 'none' }}>
+        {step === 0 ? 'Pared' : step === 1 ? 'Apunte' : 'Camino'}
+      </div>
+    </div>
+  );
+}
+
+function LevelsVisualizer() {
+  const [level, setLevel] = useState(1);
+  useEffect(() => {
+    const int = setInterval(() => setLevel(l => l >= 3 ? 1 : l + 1), 2000);
+    return () => clearInterval(int);
+  }, []);
+  
+  const size = level === 1 ? 10 : level === 2 ? 15 : 20;
+  const cellSize = level === 1 ? 20 : level === 2 ? 14 : 10;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#00ff00', textShadow: '2px 2px 0 #000'}}>Progresión de Dificultad</h3>
+      <div style={{ marginBottom: '15px', color: '#fff', fontSize: '18px' }}>Nivel {level}: Matriz {size}x{size}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${size}, ${cellSize}px)`, gap: '1px', backgroundColor: '#000', padding: '5px', border: '4px solid #00ff00', transition: 'all 0.5s ease' }}>
+        {Array.from({length: size * size}).map((_, i) => (
+          <div key={i} style={{ width: `${cellSize}px`, height: `${cellSize}px`, backgroundColor: Math.random() > 0.7 ? '#666' : '#222', transition: 'all 0.3s ease' }}></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Section1Wrapper({ slide }) {
+  const [activeImage, setActiveImage] = useState("intro");
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentRef.current) return;
+      const elements = contentRef.current.querySelectorAll('[data-spy]');
+      let currentVisible = "intro"; 
+      const containerTop = contentRef.current.scrollTop;
+      const containerHeight = contentRef.current.clientHeight;
+      
+      elements.forEach(el => {
+         const elTop = el.offsetTop - contentRef.current.offsetTop;
+         if (elTop <= containerTop + (containerHeight * 0.5)) {
+             const spyTarget = el.getAttribute('data-spy');
+             if(spyTarget) currentVisible = spyTarget;
+         }
+      });
+      setActiveImage(currentVisible);
+    };
+
+    const container = contentRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll(); 
+    }
+    return () => { if (container) container.removeEventListener('scroll', handleScroll); };
+  }, []);
+
+  return (
+    <>
+      <div className="card-content" ref={contentRef} style={{ position: 'relative' }}>
+         <div className="speaker-badge">{slide.speaker}</div>
+         <h2>{slide.title}</h2>
+         {slide.content}
+      </div>
+      <div className="card-image" style={{ transition: 'all 0.3s ease', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+         {activeImage === 'intro' ? <IntroVisualizer1 key="intro" /> 
+         : activeImage === 'matrix' ? <MatrixVisualizerLevel key="matrix" />
+         : activeImage === 'levels' ? <LevelsVisualizer key="levels" />
+         : <img key={activeImage} src={activeImage} style={{ animation: 'fadeIn 0.3s ease', maxWidth: '100%', maxHeight: '100%' }} />}
+      </div>
+    </>
+  );
+}
+
+function KeyboardVisualizer() {
+  const [key, setKey] = useState(null);
+  const [pos, setPos] = useState({x:2, y:2});
+  useEffect(() => {
+    const moves = [
+      {k: 'W', dx: 0, dy: -1}, {k: 'D', dx: 1, dy: 0},
+      {k: 'S', dx: 0, dy: 1}, {k: 'A', dx: -1, dy: 0}
+    ];
+    let i = 0;
+    const int = setInterval(() => {
+      const move = moves[i % moves.length];
+      setKey(move.k);
+      setPos(p => ({x: p.x + move.dx, y: p.y + move.dy}));
+      setTimeout(() => setKey(null), 300);
+      i++;
+    }, 1000);
+    return () => clearInterval(int);
+  }, []);
+  
+  const keyStyle = (k) => ({
+    width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center',
+    backgroundColor: key === k ? '#a0d4ff' : '#222',
+    color: key === k ? '#000' : '#fff',
+    border: '2px solid #555', borderRadius: '5px',
+    fontWeight: 'bold', transition: 'all 0.1s ease', margin: '2px'
+  });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#a0d4ff', textShadow: '2px 2px 0 #000'}}>Controles y Movimiento</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
+        <div style={keyStyle('W')}>W</div>
+        <div style={{ display: 'flex' }}>
+          <div style={keyStyle('A')}>A</div>
+          <div style={keyStyle('S')}>S</div>
+          <div style={keyStyle('D')}>D</div>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 40px)', gap: '2px', backgroundColor: '#000', padding: '5px', border: '2px solid #444' }}>
+        {Array.from({length: 25}).map((_, i) => {
+          const x = i % 5; const y = Math.floor(i / 5);
+          return (
+            <div key={i} style={{ width: '40px', height: '40px', backgroundColor: '#222', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {pos.x === x && pos.y === y && <div style={{width: '24px', height: '24px', backgroundColor: '#00f', borderRadius: '50%', boxShadow: '0 0 10px #00f'}}></div>}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StatsVisualizer() {
+  const [time, setTime] = useState(0);
+  const [steps, setSteps] = useState(0);
+  useEffect(() => {
+    const int = setInterval(() => {
+       setTime(t => t + 1);
+       if (Math.random() > 0.3) setSteps(s => s + 1);
+    }, 1000);
+    return () => clearInterval(int);
+  }, []);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#ffcc00', textShadow: '2px 2px 0 #000'}}>HUD y Estadísticas</h3>
+      <div style={{ backgroundColor: '#111', border: '3px solid #ffcc00', padding: '20px', borderRadius: '10px', width: '80%', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>
+           <span>Nivel:</span> <span style={{color: '#a0d4ff'}}>2</span>
+         </div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>
+           <span>Apuntes:</span> <span style={{color: '#ffcc00'}}>3/5</span>
+         </div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>
+           <span>Pasos:</span> <span style={{color: '#ff88ff'}}>{steps}</span>
+         </div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '18px', fontWeight: 'bold' }}>
+           <span>Tiempo:</span> <span style={{color: '#00ff00'}}>{time}s</span>
+         </div>
+      </div>
+    </div>
+  );
+}
+
+function SpawnExitVisualizer() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#00ff00', textShadow: '2px 2px 0 #000'}}>Spawn y Meta</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 50px)', gap: '2px', backgroundColor: '#000', padding: '10px', border: '4px solid #333' }}>
+        {Array.from({length: 25}).map((_, i) => {
+          const x = i % 5; const y = Math.floor(i / 5);
+          const isSpawn = x===0 && y===0;
+          const isExit = x===4 && y===4;
+          return (
+            <div key={i} style={{ width: '50px', height: '50px', backgroundColor: isSpawn ? 'rgba(0,0,255,0.2)' : isExit ? 'rgba(0,255,0,0.2)' : '#222', border: isSpawn ? '2px dashed #00f' : isExit ? '2px dashed #0f0' : 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+               {isSpawn && <div style={{width: '20px', height: '20px', backgroundColor: '#00f', borderRadius: '50%', animation: 'pulse-blue 1s infinite alternate'}}></div>}
+               {isExit && <div style={{width: '30px', height: '30px', backgroundColor: '#0f0', borderRadius: '5px', animation: 'pulse-green 1s infinite alternate'}}></div>}
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', marginTop: '15px' }}>
+        <span style={{color: '#a0d4ff'}}>Point(0,0)</span>
+        <span style={{color: '#00ff00'}}>Point(4,4)</span>
+      </div>
+      <style>{`@keyframes pulse-blue { 0% { box-shadow: 0 0 5px #00f; } 100% { box-shadow: 0 0 20px #00f; } }
+      @keyframes pulse-green { 0% { box-shadow: 0 0 5px #0f0; } 100% { box-shadow: 0 0 20px #0f0; } }`}</style>
+    </div>
+  );
+}
+
+function Section2Wrapper({ slide }) {
+  const [activeImage, setActiveImage] = useState("keys");
+  const contentRef = useRef(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentRef.current) return;
+      const elements = contentRef.current.querySelectorAll('[data-spy]');
+      let currentVisible = "keys"; 
+      const containerTop = contentRef.current.scrollTop;
+      const containerHeight = contentRef.current.clientHeight;
+      elements.forEach(el => {
+         const elTop = el.offsetTop - contentRef.current.offsetTop;
+         if (elTop <= containerTop + (containerHeight * 0.5)) {
+             const spyTarget = el.getAttribute('data-spy');
+             if(spyTarget) currentVisible = spyTarget;
+         }
+      });
+      setActiveImage(currentVisible);
+    };
+    const container = contentRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll(); 
+    }
+    return () => { if (container) container.removeEventListener('scroll', handleScroll); };
+  }, []);
+
+  return (
+    <>
+      <div className="card-content" ref={contentRef} style={{ position: 'relative' }}>
+         <div className="speaker-badge">{slide.speaker}</div>
+         <h2>{slide.title}</h2>
+         {slide.content}
+      </div>
+      <div className="card-image" style={{ transition: 'all 0.3s ease', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+         {activeImage === 'keys' ? <KeyboardVisualizer key="keys" /> 
+         : activeImage === 'stats' ? <StatsVisualizer key="stats" />
+         : activeImage === 'spawn' ? <SpawnExitVisualizer key="spawn" />
+         : <img key={activeImage} src={activeImage} style={{ animation: 'fadeIn 0.3s ease', maxWidth: '100%', maxHeight: '100%' }} />}
+      </div>
+    </>
+  );
+}
+
+function AvatarVisualizer() {
+  const [uploaded, setUploaded] = useState(false);
+  useEffect(() => {
+    const int = setInterval(() => setUploaded(u => !u), 3000);
+    return () => clearInterval(int);
+  }, []);
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#a0d4ff', textShadow: '2px 2px 0 #000'}}>Carga de Avatar</h3>
+      <div style={{ padding: '20px', backgroundColor: '#111', border: '2px solid #555', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+         <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: uploaded ? '#fff' : '#333', border: '4px solid #a0d4ff', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', transition: 'all 0.5s ease' }}>
+            {uploaded ? <img src="/images/default_avatar.png" alt="Avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : <span style={{color:'#666', fontSize:'40px'}}>?</span>}
+         </div>
+         <button style={{ padding: '10px 20px', backgroundColor: uploaded ? '#444' : '#a0d4ff', color: uploaded ? '#fff' : '#000', border: 'none', borderRadius: '5px', fontWeight: 'bold', transition: 'all 0.3s ease' }}>
+            {uploaded ? 'Archivo Cargado' : 'Subir Archivo...'}
+         </button>
+      </div>
+    </div>
+  );
+}
+
+function GlowVisualizer() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#00ff00', textShadow: '2px 2px 0 #000'}}>Efecto Glow (Pulsación)</h3>
+      <div style={{ width: '200px', height: '200px', backgroundColor: '#111', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '2px solid #333', borderRadius: '10px' }}>
+         <div style={{ width: '60px', height: '60px', backgroundColor: '#00ff00', borderRadius: '10px', animation: 'pulse-glow 1.5s infinite alternate', boxShadow: '0 0 20px #00ff00' }}></div>
+      </div>
+      <style>{`@keyframes pulse-glow { 0% { transform: scale(1); box-shadow: 0 0 10px #00ff00; } 100% { transform: scale(1.3); box-shadow: 0 0 40px #00ff00; } }`}</style>
+    </div>
+  );
+}
+
+function AudioVisualizer() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: '#ff88ff', textShadow: '2px 2px 0 #000'}}>SoundPlayer en Segundo Plano</h3>
+      <div style={{ display: 'flex', gap: '10px', height: '100px', alignItems: 'flex-end', padding: '20px', backgroundColor: '#111', border: '2px solid #555', borderRadius: '10px' }}>
+         {[1,2,3,4,5,6].map((i) => (
+            <div key={i} style={{ width: '15px', backgroundColor: '#ff88ff', animation: `eq ${0.5 + Math.random()}s infinite alternate` }}></div>
+         ))}
+      </div>
+      <style>{`@keyframes eq { 0% { height: 10px; } 100% { height: 80px; } }`}</style>
+    </div>
+  );
+}
+
+function StoryVisualizer() {
+  const [perfect, setPerfect] = useState(true);
+  useEffect(() => {
+    const int = setInterval(() => setPerfect(p => !p), 4000);
+    return () => clearInterval(int);
+  }, []);
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 0.5s ease' }}>
+      <h3 style={{color: perfect ? '#00ff00' : '#ff0000', transition: 'color 0.5s ease', textShadow: '2px 2px 0 #000'}}>Desenlace Dinámico</h3>
+      <div style={{ padding: '20px', backgroundColor: '#111', border: `2px solid ${perfect ? '#00ff00' : '#ff0000'}`, borderRadius: '10px', width: '80%', height: '150px', display: 'flex', alignItems: 'center', textAlign: 'center', transition: 'all 0.5s ease' }}>
+         <p style={{ color: perfect ? '#aaffaa' : '#ffaaaa', fontSize: '18px', fontWeight: 'bold' }}>
+           {perfect ? '¡Felicidades! Lograste encontrar todos los apuntes perdidos, tu semestre está salvado.' : 'Lograste escapar con vida, pero te faltaron apuntes. Tendrás que esforzarte más.'}
+         </p>
+      </div>
+      <div style={{ marginTop: '15px', color: '#fff', fontFamily: 'monospace' }}>
+        perfectEnding = <span style={{color: perfect ? '#00ff00' : '#ff0000'}}>{perfect ? 'true' : 'false'}</span>
+      </div>
+    </div>
+  );
+}
+
+function Section4Wrapper({ slide }) {
+  const [activeImage, setActiveImage] = useState("avatar");
+  const contentRef = useRef(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentRef.current) return;
+      const elements = contentRef.current.querySelectorAll('[data-spy]');
+      let currentVisible = "avatar"; 
+      const containerTop = contentRef.current.scrollTop;
+      const containerHeight = contentRef.current.clientHeight;
+      elements.forEach(el => {
+         const elTop = el.offsetTop - contentRef.current.offsetTop;
+         if (elTop <= containerTop + (containerHeight * 0.5)) {
+             const spyTarget = el.getAttribute('data-spy');
+             if(spyTarget) currentVisible = spyTarget;
+         }
+      });
+      setActiveImage(currentVisible);
+    };
+    const container = contentRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll(); 
+    }
+    return () => { if (container) container.removeEventListener('scroll', handleScroll); };
+  }, []);
+
+  return (
+    <>
+      <div className="card-content" ref={contentRef} style={{ position: 'relative' }}>
+         <div className="speaker-badge">{slide.speaker}</div>
+         <h2>{slide.title}</h2>
+         {slide.content}
+      </div>
+      <div className="card-image" style={{ transition: 'all 0.3s ease', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+         {activeImage === 'avatar' ? <AvatarVisualizer key="avatar" /> 
+         : activeImage === 'glow' ? <GlowVisualizer key="glow" />
+         : activeImage === 'audio' ? <AudioVisualizer key="audio" />
+         : activeImage === 'story' ? <StoryVisualizer key="story" />
+         : <img key={activeImage} src={activeImage} style={{ animation: 'fadeIn 0.3s ease', maxWidth: '100%', maxHeight: '100%' }} />}
+      </div>
+    </>
+  );
+}
+
 function Section3Wrapper({ slide }) {
   const [activeImage, setActiveImage] = useState("/images/boss_texture.png");
   const contentRef = useRef(null);
@@ -309,51 +683,128 @@ function Section3Wrapper({ slide }) {
 // DATOS DE LAS DIAPOSITIVAS
 // ----------------------------------------------------
 
+function TitleVisualizer() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', animation: 'fadeIn 1s ease' }}>
+       <div style={{ position: 'relative', width: '200px', height: '200px', animation: 'float-boss 3s ease-in-out infinite' }}>
+          <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(0, 255, 255, 0.5))' }} />
+       </div>
+       <h2 style={{ marginTop: '20px', color: '#fff', textShadow: '0 0 10px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '5px' }}>PRESS START</h2>
+       <style>{`
+         @keyframes float-boss { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+         @keyframes pulse-text-fast { 0% { opacity: 0.3; text-shadow: 0 0 5px #00ffff; } 100% { opacity: 1; text-shadow: 0 0 20px #00ffff; } }
+       `}</style>
+    </div>
+  );
+}
+
+function Section0Wrapper({ slide }) {
+  return (
+    <>
+      <div className="card-content" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+         <div className="speaker-badge" style={{ backgroundColor: '#ff0055', alignSelf: 'flex-start' }}>{slide.speaker}</div>
+         <h1 style={{ fontSize: '2.8rem', color: '#00ffff', textShadow: '2px 2px 0px #000', marginBottom: '20px' }}>{slide.title}</h1>
+         {slide.content}
+      </div>
+      <div className="card-image" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'radial-gradient(circle, #222 0%, #000 100%)', borderRadius: '15px' }}>
+         <TitleVisualizer />
+      </div>
+    </>
+  );
+}
+
+function ConclusionVisualizer() {
+  const [particles, setParticles] = useState([]);
+  useEffect(() => {
+    const arr = Array.from({length: 40}).map((_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 3,
+      color: ['#ff0055', '#00ffff', '#00ff00', '#ffcc00'][Math.floor(Math.random() * 4)]
+    }));
+    setParticles(arr);
+  }, []);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%', minHeight: '300px', justifyContent: 'center', position: 'relative', overflow: 'hidden', animation: 'fadeIn 1s ease' }}>
+       {particles.map(p => (
+         <div key={p.id} style={{
+           position: 'absolute', left: `${p.x}%`, top: `${p.y}%`, width: '10px', height: '10px', backgroundColor: p.color, borderRadius: '2px',
+           animation: `confetti 3s ease-in infinite ${p.delay}s`, opacity: 0
+         }}></div>
+       ))}
+       <div style={{ zIndex: 10, backgroundColor: 'rgba(0,0,0,0.8)', padding: '40px', borderRadius: '20px', border: '3px solid #ffcc00', textAlign: 'center', boxShadow: '0 0 30px rgba(255, 204, 0, 0.5)' }}>
+         <h2 style={{ color: '#ffcc00', fontSize: '4rem', margin: 0, animation: 'pulse-glow 1.5s infinite alternate', textShadow: '3px 3px 0 #000' }}>FIN</h2>
+         <p style={{ color: '#fff', marginTop: '15px', fontSize: '1.5rem', fontWeight: 'bold' }}>¡Gracias por su atención!</p>
+       </div>
+       <style>{`
+         @keyframes confetti {
+           0% { transform: translateY(-150px) rotate(0deg); opacity: 1; }
+           100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+         }
+       `}</style>
+    </div>
+  );
+}
+
+function Section5Wrapper({ slide }) {
+  return (
+    <>
+      <div className="card-content">
+         <div className="speaker-badge" style={{ backgroundColor: '#ffcc00', color: '#000' }}>{slide.speaker}</div>
+         <h2>{slide.title}</h2>
+         {slide.content}
+      </div>
+      <div className="card-image" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '15px', overflow: 'hidden' }}>
+         <ConclusionVisualizer />
+      </div>
+    </>
+  );
+}
+
 const slides = [
   {
     id: 0,
-    title: "LABERINTO INTERACTIVO CON NIVELES",
-    speaker: "Equipo de Desarrollo",
+    title: "Laberinto Interactivo con Niveles (C# y .NET)",
+    speaker: "Proyecto Final de Algoritmia",
+    customLayout: Section0Wrapper,
     content: (
-      <>
-        <p>Proyecto Final - Lenguaje de Programación I</p>
-        <p>Presiona [NEXT] o Barra Espaciadora para avanzar.</p>
-        <div style={{ textAlign: 'center', margin: '10px 0' }}>
-          <img src="/images/intro_cinematic.png" alt="Laberinto Intro" style={{ maxWidth: '80%', maxHeight: '140px', objectFit: 'contain', borderRadius: '8px' }} />
-        </div>
-        <p><strong>Integrantes del Equipo:</strong></p>
-        <ul>
-          <li>Nieves Pérez</li>
-          <li>Alejandra Falcón</li>
-          <li>Juan Rodríguez</li>
-          <li>Miguel Oliver</li>
+      <div style={{ fontSize: '1.2rem', lineHeight: '1.8' }}>
+        <p><strong>Integrantes:</strong></p>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          <li style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>👨‍💻 <span style={{ color: '#a0d4ff', fontWeight: 'bold' }}>Miguel Oliver:</span> Estructura de Datos y Matrices</li>
+          <li style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>👨‍💻 <span style={{ color: '#a0d4ff', fontWeight: 'bold' }}>Juan Rodríguez:</span> Interfaz Gráfica y Eventos</li>
+          <li style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>👩‍💻 <span style={{ color: '#ff88ff', fontWeight: 'bold' }}>Nieves Maza:</span> Enemigos e Inteligencia Artificial</li>
+          <li style={{ padding: '8px 0' }}>👩‍💻 <span style={{ color: '#ff88ff', fontWeight: 'bold' }}>Alejandra Falcón:</span> Multimedia y Finales</li>
         </ul>
-      </>
-    ),
-    images: ["/images/menu_background.png", "/images/intro_cinematic_2.png"],
-    layout: "grid"
+      </div>
+    )
   },
   {
     id: 1,
     title: "SECCION 1: Introducción, Estructura de Datos y Diseño de Niveles",
     speaker: "Miguel Oliver",
+    customLayout: Section1Wrapper,
     content: (
       <>
-        <h3>Introducción</h3>
-        <p>El presente proyecto, titulado "Laberinto Interactivo con Niveles", es una aplicación desarrollada en el lenguaje C# bajo la plataforma .NET (Windows Forms), orientada a poner a prueba la lógica, el análisis y el razonamiento espacial del jugador. A través de este entorno interactivo, el usuario debe encontrar la salida de diferentes laberintos progresivamente más complejos, tomando decisiones bajo presión temporal y evitando obstáculos.</p>
-        <p>Este proyecto fue concebido y programado haciendo uso estricto de los pilares fundamentales de la algoritmia y programación estructurada: estructuras de datos bidimensionales (matrices), estructuras de control iterativas y condicionales, manejo avanzado de eventos y el paradigma de Programación Orientada a Objetos (POO). A lo largo de este documento, se detallará cómo el sistema cumple de manera íntegra con todos los requisitos solicitados, así como la implementación de funcionalidades adicionales que enriquecen la experiencia.</p>
-        
-        <h3>Matriz [filas, columnas] y Manejo de Arreglos</h3>
-        <p><strong>Explicación Detallada:</strong> El núcleo lógico del mapa reside en la clase <code>Level.cs</code>. Para representar la estructura física de cada laberinto, hemos implementado una matriz bidimensional (arreglo de dos dimensiones <code>int[,] Grid</code>). Este enfoque matricial es fundamental, ya que permite que cada celda de la pantalla represente un valor numérico específico: <code>0</code> para caminos transitables, <code>1</code> para paredes infranqueables, <code>2</code> para coleccionables, <code>3</code> para la salida, entre otros.</p>
-        <p>La carga del mapa en memoria es instantánea gracias a un bloque inicializador (<code>new int[10,10]</code>). Posteriormente, <code>FormJuego</code> consume esta información iterando con ciclos <code>for</code> anidados. Al separar la lógica (Modelo) de la interfaz (Vista), el motor gráfico simplemente lee el estado <code>Grid[y, x]</code> en tiempo real, garantizando rendimiento (FPS estables) y evitando recálculos innecesarios.</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '10px 0' }}>
-          <img src="/images/wall_texture.png" alt="Pared" style={{ width: '40px', height: '40px' }} />
-          <img src="/images/floor_texture.png" alt="Suelo" style={{ width: '40px', height: '40px' }} />
-          <img src="/images/note_texture.png" alt="Coleccionable" style={{ width: '40px', height: '40px' }} />
+        <div data-spy="intro">
+          <h3>Introducción</h3>
+          <p>El presente proyecto, titulado "Laberinto Interactivo con Niveles", es una aplicación desarrollada en el lenguaje C# bajo la plataforma .NET (Windows Forms), orientada a poner a prueba la lógica, el análisis y el razonamiento espacial del jugador. A través de este entorno interactivo, el usuario debe encontrar la salida de diferentes laberintos progresivamente más complejos, tomando decisiones bajo presión temporal y evitando obstáculos.</p>
+          <p>Este proyecto fue concebido y programado haciendo uso estricto de los pilares fundamentales de la algoritmia y programación estructurada: estructuras de datos bidimensionales (matrices), estructuras de control iterativas y condicionales, manejo avanzado de eventos y el paradigma de Programación Orientada a Objetos (POO). A lo largo de este documento, se detallará cómo el sistema cumple de manera íntegra con todos los requisitos solicitados, así como la implementación de funcionalidades adicionales que enriquecen la experiencia.</p>
         </div>
         
-        <p><strong>Evidencia de Código (Renderizado desde la Matriz en FormJuego.cs):</strong></p>
-        <pre><code>{`private void pbMaze_Paint(object sender, PaintEventArgs e)
+        <div data-spy="matrix">
+          <h3>Matriz [filas, columnas] y Manejo de Arreglos</h3>
+          <p><strong>Explicación Detallada:</strong> El núcleo lógico del mapa reside en la clase <code>Level.cs</code>. Para representar la estructura física de cada laberinto, hemos implementado una matriz bidimensional (arreglo de dos dimensiones <code>int[,] Grid</code>). Este enfoque matricial es fundamental, ya que permite que cada celda de la pantalla represente un valor numérico específico: <code>0</code> para caminos transitables, <code>1</code> para paredes infranqueables, <code>2</code> para coleccionables, <code>3</code> para la salida, entre otros.</p>
+          <p>La carga del mapa en memoria es instantánea gracias a un bloque inicializador (<code>new int[10,10]</code>). Posteriormente, <code>FormJuego</code> consume esta información iterando con ciclos <code>for</code> anidados. Al separar la lógica (Modelo) de la interfaz (Vista), el motor gráfico simplemente lee el estado <code>Grid[y, x]</code> en tiempo real, garantizando rendimiento (FPS estables) y evitando recálculos innecesarios.</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '10px 0' }}>
+            <img src="/images/wall_texture.png" alt="Pared" style={{ width: '40px', height: '40px' }} />
+            <img src="/images/floor_texture.png" alt="Suelo" style={{ width: '40px', height: '40px' }} />
+            <img src="/images/note_texture.png" alt="Coleccionable" style={{ width: '40px', height: '40px' }} />
+          </div>
+          <p><strong>Evidencia de Código (Renderizado desde la Matriz en FormJuego.cs):</strong></p>
+          <pre><code>{`private void pbMaze_Paint(object sender, PaintEventArgs e)
 {
     // Iteración sobre el arreglo bidimensional
     for (int y = 0; y < _gameManager.CurrentLevel.Rows; y++)
@@ -370,17 +821,19 @@ const slides = [
         }
     }
 }`}</code></pre>
+        </div>
 
-        <h3>Implementación de al menos 3 Niveles (Dificultad Progresiva)</h3>
-        <p><strong>Explicación Detallada:</strong> El programa incluye los 3 niveles obligatorios con un diseño pensado en la curva de aprendizaje del jugador, aumentando progresivamente en tamaño, complejidad y cantidad de obstáculos.</p>
-        <ul>
-          <li><strong>Nivel 1 (Fase Tutorial):</strong> Representado por una matriz de 10x10. Se enfoca en enseñar los controles básicos al jugador mediante un panel gráfico de Tutorial y un entorno con un recorrido directo.</li>
-          <li><strong>Nivel 2 (Desafío Intermedio):</strong> Matriz ampliada de 15x15. Introduce rutas no lineales, bifurcaciones y una mayor cantidad de elementos a recolectar.</li>
-          <li><strong>Nivel 3 (Laberinto Complejo):</strong> Matriz gigante de 20x20. Se caracteriza por múltiples callejones sin salida y caminos engañosos que desafían la memoria espacial del usuario.</li>
-        </ul>
-        
-        <p><strong>Evidencia de Código (Construcción del Nivel 1 y 2 en Level.cs):</strong></p>
-        <pre><code>{`switch (levelNumber)
+        <div data-spy="levels">
+          <h3>Implementación de al menos 3 Niveles (Dificultad Progresiva)</h3>
+          <p><strong>Explicación Detallada:</strong> El programa incluye los 3 niveles obligatorios con un diseño pensado en la curva de aprendizaje del jugador, aumentando progresivamente en tamaño, complejidad y cantidad de obstáculos.</p>
+          <ul>
+            <li><strong>Nivel 1 (Fase Tutorial):</strong> Representado por una matriz de 10x10. Se enfoca en enseñar los controles básicos al jugador mediante un panel gráfico de Tutorial y un entorno con un recorrido directo.</li>
+            <li><strong>Nivel 2 (Desafío Intermedio):</strong> Matriz ampliada de 15x15. Introduce rutas no lineales, bifurcaciones y una mayor cantidad de elementos a recolectar.</li>
+            <li><strong>Nivel 3 (Laberinto Complejo):</strong> Matriz gigante de 20x20. Se caracteriza por múltiples callejones sin salida y caminos engañosos que desafían la memoria espacial del usuario.</li>
+          </ul>
+          
+          <p><strong>Evidencia de Código (Construcción del Nivel 1 y 2 en Level.cs):</strong></p>
+          <pre><code>{`switch (levelNumber)
 {
     case 1:
         Grid = new int[10, 10]
@@ -400,23 +853,24 @@ const slides = [
         ExitPosition = new Point(8, 8);
         break;
 }`}</code></pre>
+        </div>
       </>
-    ),
-    images: ["/images/wall_texture.png", "/images/floor_texture.png"],
-    layout: "grid"
+    )
   },
   {
     id: 2,
     title: "SECCION 2: Interfaz Gráfica, Controles y Manejo de Eventos",
     speaker: "Juan Rodríguez",
+    customLayout: Section2Wrapper,
     content: (
       <>
-        <h3>Personaje que se mueve con el teclado (y botones)</h3>
-        <p><strong>Explicación Detallada:</strong> La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva. Sobreescribiendo el método <code>ProcessCmdKey</code>, interceptamos eventos a nivel de sistema operativo (teclas direccionales y WASD) antes del procesamiento normal del formulario. Esta delegación de lógica al método <code>HandleMove(Direction)</code> de <code>GameManager</code> encapsula perfectamente la responsabilidad.</p>
-        <p>El código verifica proactivamente si la celda destino es transitable (<code>targetCell != 1</code>) evaluando las colisiones de manera matemática, lo que previene cruzar paredes o generar errores de límites (IndexOutOfRange) en la matriz principal.</p>
-        
-        <p><strong>Evidencia de Código (Eventos de Teclado en FormJuego.cs):</strong></p>
-        <pre><code>{`// Captura de eventos del teclado en tiempo real
+        <div data-spy="keys">
+          <h3>Personaje que se mueve con el teclado (y botones)</h3>
+          <p><strong>Explicación Detallada:</strong> La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva. Sobreescribiendo el método <code>ProcessCmdKey</code>, interceptamos eventos a nivel de sistema operativo (teclas direccionales y WASD) antes del procesamiento normal del formulario. Esta delegación de lógica al método <code>HandleMove(Direction)</code> de <code>GameManager</code> encapsula perfectamente la responsabilidad.</p>
+          <p>El código verifica proactivamente si la celda destino es transitable (<code>targetCell != 1</code>) evaluando las colisiones de manera matemática, lo que previene cruzar paredes o generar errores de límites (IndexOutOfRange) en la matriz principal.</p>
+          
+          <p><strong>Evidencia de Código (Eventos de Teclado en FormJuego.cs):</strong></p>
+          <pre><code>{`// Captura de eventos del teclado en tiempo real
 protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 {
     if (_isPaused) return base.ProcessCmdKey(ref msg, keyData); // Validación de estado de pausa
@@ -433,12 +887,14 @@ protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     }
     return base.ProcessCmdKey(ref msg, keyData);
 }`}</code></pre>
+        </div>
 
-        <h3>Mostrar Tiempo y Número de Pasos (Estadísticas en Tiempo Real)</h3>
-        <p><strong>Explicación Detallada:</strong> Mantener al jugador informado de su progreso es crucial para la experiencia de juego. Por ello, se implementó un sistema de actualización de estadísticas que combina las propiedades del temporizador (<code>Timer</code> tick) y variables de estado internas.</p>
-        
-        <p><strong>Evidencia de Código (FormJuego.cs):</strong></p>
-        <pre><code>{`private void gameTimer_Tick(object sender, EventArgs e)
+        <div data-spy="stats">
+          <h3>Mostrar Tiempo y Número de Pasos (Estadísticas en Tiempo Real)</h3>
+          <p><strong>Explicación Detallada:</strong> Mantener al jugador informado de su progreso es crucial para la experiencia de juego. Por ello, se implementó un sistema de actualización de estadísticas que combina las propiedades del temporizador (<code>Timer</code> tick) y variables de estado internas.</p>
+          
+          <p><strong>Evidencia de Código (FormJuego.cs):</strong></p>
+          <pre><code>{`private void gameTimer_Tick(object sender, EventArgs e)
 {
     _gameManager.TimeElapsedSeconds++;
     UpdateStats();
@@ -448,13 +904,16 @@ private void UpdateStats()
 {
     lblStats.Text = $"Nivel: {_gameManager.CurrentLevelNumber} | Apuntes: {_gameManager.StarsCollected}/{_gameManager.CurrentLevel.TotalStars} | Pasos: {_gameManager.Steps} | Tiempo: {_gameManager.TimeElapsedSeconds}s";
 }`}</code></pre>
-        <h3>Puntos de Inicio y Salida Estructurados</h3>
-        <p>
-          <img src="/images/exit_texture.png" alt="Meta" style={{ width: '60px', height: '60px', float: 'right', margin: '0 0 10px 15px', borderRadius: '5px' }} />
-          <strong>Explicación Detallada:</strong> Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo <code>Point</code> (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el <code>GameManager</code> valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.
-        </p>
-        <p><strong>Evidencia de Código (Level.cs y GameManager.cs):</strong></p>
-        <pre><code>{`// Constructor de Nivel (Level.cs)
+        </div>
+
+        <div data-spy="spawn">
+          <h3>Puntos de Inicio y Salida Estructurados</h3>
+          <p>
+            <img src="/images/exit_texture.png" alt="Meta" style={{ width: '60px', height: '60px', float: 'right', margin: '0 0 10px 15px', borderRadius: '5px' }} />
+            <strong>Explicación Detallada:</strong> Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo <code>Point</code> (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el <code>GameManager</code> valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.
+          </p>
+          <p><strong>Evidencia de Código (Level.cs y GameManager.cs):</strong></p>
+          <pre><code>{`// Constructor de Nivel (Level.cs)
 StartPosition = new Point(1, 1);
 ExitPosition = new Point(8, 8); // Coordenada de victoria dictada en la matriz
 
@@ -463,10 +922,9 @@ if (targetCell == 3) // La celda 3 representa la Salida en la matriz
 {
     CheckWinCondition(); // Ejecuta lógica de victoria y avance
 }`}</code></pre>
+        </div>
       </>
-    ),
-    images: ["/images/default_avatar.png", "/images/exit_texture.png"],
-    layout: "grid"
+    )
   },
   {
     id: 3,
@@ -577,14 +1035,8 @@ if (_isHardcore && playerPos.X != -1)
             for (int x = 0; x < cols; x++)
             {
                 // Fórmula de distancia para medir cercanía al jugador
-                int distX = Math.Abs(playerPos.X - x);
-                int distY = Math.Abs(playerPos.Y - y);
-                if (Math.Max(distX, distY) > 2)
-                {
-                    RectangleF rect = new RectangleF(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                    g.FillRectangle(fogBrush, rect); // Ciega la vista
-                }
-            }
+        if (targetCell != 1) 
+        {
         }
     }
 }`}</code></pre>
@@ -596,61 +1048,63 @@ if (_isHardcore && playerPos.X != -1)
     id: 4,
     title: "SECCION 4: Multimedia, Personalización y Finales Múltiples",
     speaker: "Alejandra Falcón",
+    customLayout: Section4Wrapper,
     content: (
       <>
-        <h3>Subida de Avatar Personalizado (Gestión de Archivos Locales)</h3>
-        <p>
-          <img src="/images/default_avatar.png" alt="Avatar" style={{ width: '70px', height: '70px', float: 'left', margin: '0 15px 10px 0', borderRadius: '50%' }} />
-          <strong>Explicación Detallada:</strong> Se le otorga identidad al jugador permitiendo personalizar su representación visual. Mediante el uso de componentes del sistema operativo (<code>OpenFileDialog</code>), el software permite navegar por el disco duro del usuario, aplicar filtros de extensión (<code>.png</code>, <code>.jpg</code>) y cargar un archivo gráfico a la memoria RAM de la aplicación, utilizándolo dinámicamente durante el juego.
-        </p>
-        <p><strong>Evidencia de Código (FormMenu.cs):</strong></p>
-        <pre><code>{`private void btnUploadAvatar_Click(object sender, EventArgs e)
+        <div data-spy="avatar">
+          <h3>Subida de Avatar Personalizado (Gestión de Archivos Locales)</h3>
+          <p>
+            <strong>Explicación Detallada:</strong> Se le otorga identidad al jugador permitiendo personalizar su representación visual mediante el uso de <code>OpenFileDialog</code>.
+          </p>
+          <p><strong>Evidencia de Código (FormMenu.cs):</strong></p>
+          <pre><code>{`private void btnUploadAvatar_Click(object sender, EventArgs e)
 {
     using (OpenFileDialog ofd = new OpenFileDialog())
     {
         ofd.Filter = "Archivos de Imagen|*.jpg;*.jpeg;*.png;*.bmp";
         if (ofd.ShowDialog() == DialogResult.OK)
         {
-            _avatarImage = Image.FromFile(ofd.FileName); // Carga la imagen local en un objeto Image
-            pbAvatar.Image = _avatarImage; // Actualiza la vista previa en el menú
+            _avatarImage = Image.FromFile(ofd.FileName); 
+            pbAvatar.Image = _avatarImage; 
         }
     }
 }`}</code></pre>
+        </div>
 
-        <h3>Texturas y Efecto Visual Pulsante (Renderizado Dinámico)</h3>
-        <p><strong>Explicación Detallada:</strong> Rompiendo con la monotonía de cuadros estáticos, la casilla de salida emplea un cálculo senoidal para crear una ilusión óptica de pulsación (Glow Effect). Esto se logra alterando las dimensiones de la imagen (escalado) en el método de dibujo, creando dinamismo visual sin la necesidad de usar costosos motores de render 3D.</p>
-        <p><strong>Evidencia de Código (FormJuego.cs):</strong></p>
-        <pre><code>{`// Escalado de la salida (Meta) con un efecto tipo 'Glow' animado por tiempo
-int targetSize = (int)(CellSize * _glowScale);
-int offset = (CellSize - targetSize) / 2; // Centrado matemático del rectángulo escalado
+        <div data-spy="glow">
+          <h3>Texturas y Efecto Visual Pulsante (Renderizado Dinámico)</h3>
+          <p><strong>Explicación Detallada:</strong> La casilla de salida emplea un cálculo senoidal para crear una ilusión óptica de pulsación (Glow Effect).</p>
+          <p><strong>Evidencia de Código (FormJuego.cs):</strong></p>
+          <pre><code>{`int targetSize = (int)(CellSize * _glowScale);
+int offset = (CellSize - targetSize) / 2;
 Rectangle targetRect = new Rectangle(x * CellSize + offset, y * CellSize + offset, targetSize, targetSize);
-e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la textura animada en pantalla`}</code></pre>
-        <h3>Sistema de Audio Integrado</h3>
-        <p><strong>Explicación Detallada:</strong> Utilizando la clase nativa <code>System.Media.SoundPlayer</code> dentro de un envoltorio <code>AudioPlayer</code>, logramos que los sonidos se ejecuten sin bloquear el hilo principal (UI Thread). Al invocar <code>PlayLooping()</code>, la música funciona asíncronamente en segundo plano. Esto asegura que el sistema no presente tirones gráficos mientras decodifica el audio (streams de bytes cargados en memoria).</p>
-        <p><strong>Evidencia de Código (AudioPlayer.cs):</strong></p>
-        <pre><code>{`public void PlayMusic()
+e.Graphics.DrawImage(Properties.Resources.salida, targetRect);`}</code></pre>
+        </div>
+
+        <div data-spy="audio">
+          <h3>Sistema de Audio Integrado</h3>
+          <p><strong>Explicación Detallada:</strong> Utilizando la clase nativa <code>System.Media.SoundPlayer</code> logramos que los sonidos se ejecuten sin bloquear el hilo principal.</p>
+          <pre><code>{`public void PlayMusic()
 {
     _musicPlayer.Stream = Properties.Resources.scary_music;
-    _musicPlayer.PlayLooping(); // Ejecuta la pista en repetición infinita en un hilo secundario
+    _musicPlayer.PlayLooping();
 }`}</code></pre>
+        </div>
 
-        <h3>Pantallas de Historia y Múltiples Desenlaces (FormHistoria)</h3>
-        <p><strong>Explicación Detallada:</strong> Añadiendo una capa narrativa al proyecto, el juego evalúa el estado del jugador al concluir los niveles. Si el sistema detecta que el jugador recogió el 100% de los elementos disponibles, instancia el formulario de conclusión enviando un parámetro booleano de éxito total (<code>perfectEnding = true</code>), desencadenando un mensaje de victoria óptima. De lo contrario, desencadena un final alternativo.</p>
-        <p><strong>Evidencia de Código (FormHistoria.cs):</strong></p>
-        <pre><code>{`public FormHistoria(bool perfectEnding)
+        <div data-spy="story">
+          <h3>Pantallas de Historia y Múltiples Desenlaces (FormHistoria)</h3>
+          <p><strong>Explicación Detallada:</strong> Añadiendo una capa narrativa al proyecto, el juego evalúa el estado del jugador al concluir los niveles.</p>
+          <pre><code>{`public FormHistoria(bool perfectEnding)
 {
     InitializeComponent();
-    
-    // Decisión narrativa basada en el parámetro pasado al constructor
     if (perfectEnding)
         txtStory.Text = "¡Felicidades! Lograste encontrar todos los apuntes perdidos, tu semestre está salvado.";
     else
-        txtStory.Text = "Lograste escapar con vida, pero te faltaron apuntes de clase por recuperar. Tendrás que esforzarte más en el examen.";
+        txtStory.Text = "Lograste escapar con vida, pero te faltaron apuntes de clase por recuperar.";
 }`}</code></pre>
+        </div>
       </>
-    ),
-    images: ["/images/outro_cinematic.png", "/images/note_texture.png"],
-    layout: "grid"
+    )
   },
   {
     id: 5,
