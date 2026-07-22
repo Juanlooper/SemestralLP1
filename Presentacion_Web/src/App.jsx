@@ -703,23 +703,20 @@ function TitleVisualizer() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', minHeight: '350px', animation: 'fadeIn 1s ease', position: 'relative', overflow: 'hidden' }}>
       
       {/* Grid Animado de Fondo */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 30px)', gap: '3px', position: 'absolute', opacity: 0.4, transform: 'perspective(500px) rotateX(20deg)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 35px)', gap: '4px', position: 'absolute', opacity: 0.9, transform: 'perspective(500px) rotateX(20deg)' }}>
         {Array.from({ length: 64 }).map((_, i) => {
           const x = i % 8; const y = Math.floor(i / 8);
           const isPlayer = player.x === x && player.y === y;
           const isBoss = x === 6 && y === 1;
           const isPath = (x > 0 && x < 7 && y > 0 && y < 6);
           return (
-            <div key={i} style={{ width: '30px', height: '30px', backgroundColor: isPlayer ? '#00f' : isBoss ? '#f00' : isPath ? '#111' : '#333', borderRadius: isPlayer || isBoss ? '50%' : '2px', transition: 'all 0.2s ease', boxShadow: isPlayer ? '0 0 15px #00f' : isBoss ? '0 0 15px #f00' : 'none' }}></div>
+            <div key={i} style={{ width: '35px', height: '35px', backgroundColor: isPlayer ? '#00f' : isBoss ? '#f00' : isPath ? '#111' : '#333', borderRadius: isPlayer || isBoss ? '50%' : '2px', transition: 'all 0.2s ease', boxShadow: isPlayer ? '0 0 15px #00f' : isBoss ? '0 0 15px #f00' : 'none' }}></div>
           )
         })}
       </div>
 
-      <div style={{ zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(0, 255, 255, 0.3)' }}>
-        <div style={{ position: 'relative', width: '180px', height: '180px', animation: 'float-boss 3s ease-in-out infinite' }}>
-          <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 30px rgba(0, 255, 255, 0.8))', mixBlendMode: 'screen' }} />
-        </div>
-        <h2 style={{ marginTop: '20px', color: '#fff', textShadow: '0 0 15px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '6px' }}>PRESS START</h2>
+      <div style={{ zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '160px' }}>
+        <h2 style={{ margin: 0, color: '#fff', textShadow: '0 0 15px #000, 0 0 30px #000, 0 0 10px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '8px', fontSize: '2.5rem', backgroundColor: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: '10px', border: '1px solid rgba(0,255,255,0.2)' }}>PRESS START</h2>
       </div>
 
       <style>{`
