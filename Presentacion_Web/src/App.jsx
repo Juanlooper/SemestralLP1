@@ -361,30 +361,36 @@ function App() {
       <div className="slide-container" key={slide.id}>
         
         <div className={`presentation-card ${slide.layout === 'single' ? 'single-col' : ''}`}>
-          <div className="card-content">
-            <div className="speaker-badge">{slide.speaker}</div>
-            <h2>{slide.title}</h2>
-            {slide.content}
-          </div>
-          
-          {slide.layout === 'grid' && (
-            <div className="card-image" style={{ display: 'flex', flexDirection: 'column', gap: '15px', height: '100%', minHeight: 0 }}>
-              {slide.images ? slide.images.map((img, idx) => (
-                <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
-              )) : (
-                <img src={slide.image} alt={slide.title} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
+          {slide.customLayout ? (
+             <slide.customLayout slide={slide} />
+          ) : (
+            <>
+              <div className="card-content">
+                <div className="speaker-badge">{slide.speaker}</div>
+                <h2>{slide.title}</h2>
+                {slide.content}
+              </div>
+              
+              {slide.layout === 'grid' && (
+                <div className="card-image" style={{ display: 'flex', flexDirection: 'column', gap: '15px', height: '100%', minHeight: 0 }}>
+                  {slide.images ? slide.images.map((img, idx) => (
+                    <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
+                  )) : (
+                    <img src={slide.image} alt={slide.title} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
+                  )}
+                </div>
               )}
-            </div>
-          )}
 
-          {slide.layout === 'single' && (
-             <div className="card-image" style={{marginTop: '10px'}}>
-               {slide.images ? slide.images.map((img, idx) => (
-                 <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{maxHeight: '120px', margin: '0 10px'}}/>
-               )) : (
-                 <img src={slide.image} alt={slide.title} style={{maxHeight: '120px'}}/>
-               )}
-             </div>
+              {slide.layout === 'single' && (
+                 <div className="card-image" style={{marginTop: '10px'}}>
+                   {slide.images ? slide.images.map((img, idx) => (
+                     <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{maxHeight: '120px', margin: '0 10px'}}/>
+                   )) : (
+                     <img src={slide.image} alt={slide.title} style={{maxHeight: '120px'}}/>
+                   )}
+                 </div>
+              )}
+            </>
           )}
         </div>
 
