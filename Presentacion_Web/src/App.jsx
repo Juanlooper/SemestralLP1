@@ -717,7 +717,7 @@ function TitleVisualizer() {
 
       <div style={{ zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(0, 255, 255, 0.3)' }}>
         <div style={{ position: 'relative', width: '180px', height: '180px', animation: 'float-boss 3s ease-in-out infinite' }}>
-          <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 30px rgba(0, 255, 255, 0.8))' }} />
+          <img src="/images/boss_texture.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 30px rgba(0, 255, 255, 0.8))', mixBlendMode: 'screen' }} />
         </div>
         <h2 style={{ marginTop: '20px', color: '#fff', textShadow: '0 0 15px #00ffff', animation: 'pulse-text-fast 1s infinite alternate', fontFamily: 'monospace', letterSpacing: '6px' }}>PRESS START</h2>
       </div>
@@ -1173,6 +1173,7 @@ e.Graphics.DrawImage(Properties.Resources.salida, targetRect);`}</code></pre>
     id: 5,
     title: "CONCLUSIÓN Y CIERRE",
     speaker: "Equipo",
+    customLayout: Section5Wrapper,
     content: (
       <>
         <h3>Explicación Técnica y Conclusión</h3>
@@ -1190,9 +1191,7 @@ e.Graphics.DrawImage(Properties.Resources.salida, targetRect);`}</code></pre>
         </ul>
         <p><strong>¡GRACIAS POR SU ATENCIÓN!</strong></p>
       </>
-    ),
-    image: "/images/conclusion.png",
-    layout: "single"
+    )
   }
 ];
 
