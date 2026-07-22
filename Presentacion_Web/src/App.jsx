@@ -10,7 +10,9 @@ const slides = [
       <>
         <p>Proyecto Final - Lenguaje de Programación I</p>
         <p>Presiona [NEXT] o Barra Espaciadora para avanzar.</p>
-        <br/>
+        <div style={{ textAlign: 'center', margin: '10px 0' }}>
+          <img src="/images/intro_cinematic.png" alt="Laberinto Intro" style={{ maxWidth: '80%', maxHeight: '140px', objectFit: 'contain', borderRadius: '8px' }} />
+        </div>
         <p><strong>Integrantes del Equipo:</strong></p>
         <ul>
           <li>Nieves Pérez</li>
@@ -20,7 +22,7 @@ const slides = [
         </ul>
       </>
     ),
-    image: "/images/menu_background.png",
+    images: ["/images/menu_background.png", "/images/intro_cinematic_2.png"],
     layout: "grid"
   },
   {
@@ -35,7 +37,12 @@ const slides = [
         
         <h3>Matriz [filas, columnas] y Manejo de Arreglos</h3>
         <p><strong>Explicación Detallada:</strong> El núcleo lógico del mapa reside en la clase <code>Level.cs</code>. Para representar la estructura física de cada laberinto, hemos implementado una matriz bidimensional (arreglo de dos dimensiones <code>int[,] Grid</code>). Este enfoque matricial es fundamental, ya que permite que cada celda de la pantalla represente un valor numérico específico: <code>0</code> para caminos transitables, <code>1</code> para paredes infranqueables, <code>2</code> para coleccionables, <code>3</code> para la salida, entre otros.</p>
-        <p>El motor gráfico renderiza este entorno recorriendo la matriz de manera exhaustiva mediante ciclos <code>for</code> anidados. Al leer el valor de cada celda, la aplicación determina qué textura o color dibujar en las coordenadas correspondientes, asegurando un mapeo exacto entre la estructura de datos en memoria y la interfaz gráfica mostrada al usuario.</p>
+        <p>La carga del mapa en memoria es instantánea gracias a un bloque inicializador (<code>new int[10,10]</code>). Posteriormente, <code>FormJuego</code> consume esta información iterando con ciclos <code>for</code> anidados. Al separar la lógica (Modelo) de la interfaz (Vista), el motor gráfico simplemente lee el estado <code>Grid[y, x]</code> en tiempo real, garantizando rendimiento (FPS estables) y evitando recálculos innecesarios.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '10px 0' }}>
+          <img src="/images/wall_texture.png" alt="Pared" style={{ width: '40px', height: '40px' }} />
+          <img src="/images/floor_texture.png" alt="Suelo" style={{ width: '40px', height: '40px' }} />
+          <img src="/images/note_texture.png" alt="Coleccionable" style={{ width: '40px', height: '40px' }} />
+        </div>
         
         <p><strong>Evidencia de Código (Renderizado desde la Matriz en FormJuego.cs):</strong></p>
         <pre><code>{`private void pbMaze_Paint(object sender, PaintEventArgs e)
@@ -100,7 +107,7 @@ const slides = [
 }`}</code></pre>
       </>
     ),
-    image: "/images/wall_texture.png",
+    images: ["/images/wall_texture.png", "/images/floor_texture.png"],
     layout: "grid"
   },
   {
@@ -110,7 +117,8 @@ const slides = [
     content: (
       <>
         <h3>Personaje que se mueve con el teclado (y botones)</h3>
-        <p><strong>Explicación Detallada:</strong> La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva mediante Windows Forms, configurada para detectar pulsaciones en tiempo real. Sobreescribiendo el método nativo <code>ProcessCmdKey</code>, la aplicación es capaz de capturar eficientemente las teclas de dirección (Flechas y W,A,S,D) antes de que el formulario las procese de manera predeterminada. Una vez detectada la tecla, se invoca inmediatamente la lógica de movimiento, calculando la nueva posición deseada. También se incluyeron botones visuales en pantalla para permitir la jugabilidad con el ratón o pantallas táctiles.</p>
+        <p><strong>Explicación Detallada:</strong> La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva. Sobreescribiendo el método <code>ProcessCmdKey</code>, interceptamos eventos a nivel de sistema operativo (teclas direccionales y WASD) antes del procesamiento normal del formulario. Esta delegación de lógica al método <code>HandleMove(Direction)</code> de <code>GameManager</code> encapsula perfectamente la responsabilidad.</p>
+        <p>El código verifica proactivamente si la celda destino es transitable (<code>targetCell != 1</code>) evaluando las colisiones de manera matemática, lo que previene cruzar paredes o generar errores de límites (IndexOutOfRange) en la matriz principal.</p>
         
         <p><strong>Evidencia de Código (Eventos de Teclado en FormJuego.cs):</strong></p>
         <pre><code>{`// Captura de eventos del teclado en tiempo real
@@ -147,7 +155,10 @@ private void UpdateStats()
 }`}</code></pre>
 
         <h3>Puntos de Inicio y Salida Estructurados</h3>
-        <p><strong>Explicación Detallada:</strong> Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo <code>Point</code> (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el <code>GameManager</code> valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.</p>
+        <p>
+          <img src="/images/exit_texture.png" alt="Meta" style={{ width: '60px', height: '60px', float: 'right', margin: '0 0 10px 15px', borderRadius: '5px' }} />
+          <strong>Explicación Detallada:</strong> Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo <code>Point</code> (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el <code>GameManager</code> valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.
+        </p>
         <p><strong>Evidencia de Código (Level.cs y GameManager.cs):</strong></p>
         <pre><code>{`// Constructor de Nivel (Level.cs)
 StartPosition = new Point(1, 1);
@@ -160,7 +171,7 @@ if (targetCell == 3) // La celda 3 representa la Salida en la matriz
 }`}</code></pre>
       </>
     ),
-    image: "/images/default_avatar.png",
+    images: ["/images/default_avatar.png", "/images/exit_texture.png"],
     layout: "grid"
   },
   {
@@ -237,7 +248,10 @@ case 4:
     content: (
       <>
         <h3>Subida de Avatar Personalizado (Gestión de Archivos Locales)</h3>
-        <p><strong>Explicación Detallada:</strong> Se le otorga identidad al jugador permitiendo personalizar su representación visual. Mediante el uso de componentes del sistema operativo (<code>OpenFileDialog</code>), el software permite navegar por el disco duro del usuario, aplicar filtros de extensión (<code>.png</code>, <code>.jpg</code>) y cargar un archivo gráfico a la memoria RAM de la aplicación, utilizándolo dinámicamente durante el juego.</p>
+        <p>
+          <img src="/images/default_avatar.png" alt="Avatar" style={{ width: '70px', height: '70px', float: 'left', margin: '0 15px 10px 0', borderRadius: '50%' }} />
+          <strong>Explicación Detallada:</strong> Se le otorga identidad al jugador permitiendo personalizar su representación visual. Mediante el uso de componentes del sistema operativo (<code>OpenFileDialog</code>), el software permite navegar por el disco duro del usuario, aplicar filtros de extensión (<code>.png</code>, <code>.jpg</code>) y cargar un archivo gráfico a la memoria RAM de la aplicación, utilizándolo dinámicamente durante el juego.
+        </p>
         <p><strong>Evidencia de Código (FormMenu.cs):</strong></p>
         <pre><code>{`private void btnUploadAvatar_Click(object sender, EventArgs e)
 {
@@ -262,7 +276,7 @@ Rectangle targetRect = new Rectangle(x * CellSize + offset, y * CellSize + offse
 e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la textura animada en pantalla`}</code></pre>
 
         <h3>Sistema de Audio Integrado</h3>
-        <p><strong>Explicación Detallada:</strong> La inmersión se consolida con el aspecto sonoro. Utilizando la clase nativa <code>System.Media.SoundPlayer</code>, se implementó música de fondo y efectos especiales que responden a los eventos del juego, mejorando significativamente el feedback auditivo provisto al jugador.</p>
+        <p><strong>Explicación Detallada:</strong> Utilizando la clase nativa <code>System.Media.SoundPlayer</code> dentro de un envoltorio <code>AudioPlayer</code>, logramos que los sonidos se ejecuten sin bloquear el hilo principal (UI Thread). Al invocar <code>PlayLooping()</code>, la música funciona asíncronamente en segundo plano. Esto asegura que el sistema no presente tirones gráficos mientras decodifica el audio (streams de bytes cargados en memoria).</p>
         <p><strong>Evidencia de Código (AudioPlayer.cs):</strong></p>
         <pre><code>{`public void PlayMusic()
 {
@@ -285,7 +299,7 @@ e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la text
 }`}</code></pre>
       </>
     ),
-    image: "/images/outro_cinematic.png",
+    images: ["/images/outro_cinematic.png", "/images/note_texture.png"],
     layout: "grid"
   },
   {
@@ -294,21 +308,23 @@ e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la text
     speaker: "Equipo",
     content: (
       <>
-        <h3>Conclusión</h3>
-        <p>El desarrollo e iteración de este "Laberinto Interactivo con Niveles" ha demostrado de manera práctica y tangible la importancia de comprender y aplicar correctamente las estructuras de datos, específicamente las matrices bidimensionales, en el diseño de entornos virtuales lógicos. Se logró cumplir con éxito rotundo todos los objetivos y requerimientos propuestos, integrando una interfaz gráfica intuitiva mediante Windows Forms, control fluido de eventos del teclado en tiempo real y el uso avanzado de la Programación Orientada a Objetos para mantener un código limpio, modular y altamente escalable.</p>
-        <p>Además de satisfacer los requisitos obligatorios, nuestro equipo invirtió el esfuerzo adicional para implementar mecánicas avanzadas como la inteligencia artificial del enemigo (búsqueda de ruta), efectos visuales inmersivos (niebla de guerra y animaciones pulsantes) y sistemas multimedia (audio e imágenes locales). Todo ello enriquece notablemente la experiencia del usuario final y le otorga al proyecto un acabado profesional. Este desafío sirvió no solo para consolidar nuestros conocimientos en la sintaxis de C#, sino también para ofrecernos una visión profunda y enriquecedora sobre cómo se estructura integralmente la lógica de software interactivo.</p>
+        <h3>Explicación Técnica y Conclusión</h3>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '15px 0' }}>
+          <img src="/images/intro_cinematic_2.png" alt="Diseño" style={{ height: '140px', borderRadius: '8px' }} />
+          <img src="/images/outro_cinematic.png" alt="Victoria" style={{ height: '140px', borderRadius: '8px' }} />
+        </div>
+        <p>A nivel de código, el motor lógico está centralizado en el manejo exhaustivo de <strong>matrices bidimensionales</strong> (<code>int[,] Grid</code> en <code>Level.cs</code>). Cada nivel se dibuja iterando con bucles anidados para ubicar texturas según el valor numérico correspondiente.</p>
+        <p>A través de <strong>POO</strong>, interactúan clases específicas: <code>Player</code> encapsula coordenadas y estado, <code>Level</code> gestiona el mapa y condiciones de victoria, mientras <code>GameManager</code> administra reglas como IA enemiga con temporizadores y colisiones. Así, logramos una arquitectura limpia, modular y basada en eventos.</p>
         
-        <h3>Referencias Bibliográficas y Tecnologías</h3>
+        <h3>Tecnologías Empleadas</h3>
         <ul>
-          <li>Microsoft Corporation. (2023). <em>Documentación de C# y .NET</em>.</li>
-          <li>Microsoft Corporation. (2023). <em>Windows Forms Documentation</em>.</li>
           <li>Lenguaje: C# 12.0 | Framework: .NET 8.0 (Windows Forms)</li>
-          <li>IDE: Visual Studio 2022 | Arquitectura: POO, Programación Basada en Eventos</li>
+          <li>Arquitectura: POO, Programación Basada en Eventos</li>
         </ul>
         <p><strong>¡GRACIAS POR SU ATENCIÓN!</strong></p>
       </>
     ),
-    image: "/images/intro_cinematic.png",
+    image: "/images/conclusion.png",
     layout: "single"
   }
 ];
@@ -352,14 +368,22 @@ function App() {
           </div>
           
           {slide.layout === 'grid' && (
-            <div className="card-image">
-              <img src={slide.image} alt={slide.title} />
+            <div className="card-image" style={{ display: 'flex', flexDirection: 'column', gap: '15px', height: '100%', minHeight: 0 }}>
+              {slide.images ? slide.images.map((img, idx) => (
+                <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
+              )) : (
+                <img src={slide.image} alt={slide.title} style={{ borderRadius: '8px', flex: 1, minHeight: 0, objectFit: 'contain', width: '100%' }} />
+              )}
             </div>
           )}
 
           {slide.layout === 'single' && (
-             <div className="card-image" style={{marginTop: '20px'}}>
-               <img src={slide.image} alt={slide.title} style={{maxHeight: '300px'}}/>
+             <div className="card-image" style={{marginTop: '10px'}}>
+               {slide.images ? slide.images.map((img, idx) => (
+                 <img key={idx} src={img} alt={`${slide.title} ${idx}`} style={{maxHeight: '120px', margin: '0 10px'}}/>
+               )) : (
+                 <img src={slide.image} alt={slide.title} style={{maxHeight: '120px'}}/>
+               )}
              </div>
           )}
         </div>

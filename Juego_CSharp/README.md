@@ -21,6 +21,9 @@ El núcleo lógico del mapa reside en la clase `Level.cs`. Para representar la e
 
 El motor gráfico renderiza este entorno recorriendo la matriz de manera exhaustiva mediante ciclos `for` anidados. Al leer el valor de cada celda, la aplicación determina qué textura o color dibujar en las coordenadas correspondientes, asegurando un mapeo exacto entre la estructura de datos en memoria y la interfaz gráfica mostrada al usuario.
 
+**Herramientas de Visual Studio (UI):** `PictureBox`
+**Función:** Se utiliza un control `PictureBox` (nombrado `pbMaze`) como lienzo (canvas) principal. A través de su evento `Paint`, se emplea el objeto `Graphics` para dibujar dinámicamente cada celda de la matriz bidimensional (paredes, suelo, apuntes) directamente en la pantalla, traduciendo los números en imágenes.
+
 **Evidencia de Código (Renderizado desde la Matriz en `FormJuego.cs`):**
 ```csharp
 private void pbMaze_Paint(object sender, PaintEventArgs e)
@@ -50,6 +53,9 @@ El programa incluye los 3 niveles obligatorios con un diseño pensado en la curv
 - **Nivel 3 (Laberinto Complejo):** Matriz gigante de 20x20. Se caracteriza por múltiples callejones sin salida y caminos engañosos que desafían la memoria espacial del usuario.
 
 Cada nivel se carga dinámicamente instanciando un nuevo mapa dentro de nuestra clase manejadora.
+
+**Herramientas de Visual Studio (UI):** Renderizado de Matriz Lógica.
+**Función:** Aunque no se utiliza un elemento drag-and-drop de UI para los niveles directamente, la estructura lógica resultante se inyecta en el `PictureBox` y en las etiquetas informativas (como el `Label` de "Nivel Actual").
 
 **Evidencia de Código (Construcción del Nivel 1 y 2 en `Level.cs`):**
 ```csharp
@@ -95,6 +101,9 @@ switch (levelNumber)
 **Explicación Detallada:** 
 La interacción usuario-sistema se logró integrando una interfaz gráfica responsiva mediante Windows Forms, configurada para detectar pulsaciones en tiempo real. Sobreescribiendo el método nativo `ProcessCmdKey`, la aplicación es capaz de capturar eficientemente las teclas de dirección (Flechas y W,A,S,D) antes de que el formulario las procese de manera predeterminada. Una vez detectada la tecla, se invoca inmediatamente la lógica de movimiento, calculando la nueva posición deseada. También se incluyeron botones visuales en pantalla para permitir la jugabilidad con el ratón o pantallas táctiles.
 
+**Herramientas de Visual Studio (UI):** `Form` (Eventos) y `Button` (Botones).
+**Función:** El contenedor principal del formulario (`Form`) sobreescribe sus propias propiedades a nivel ventana para capturar teclas. Adicionalmente, se utilizan controles `Button` para ofrecer alternativas táctiles o de ratón, asociando el evento `Click` a las mismas rutinas de movimiento.
+
 **Evidencia de Código (Eventos de Teclado en `FormJuego.cs`):**
 ```csharp
 // Captura de eventos del teclado en tiempo real
@@ -120,6 +129,9 @@ protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 **Explicación Detallada:** 
 Mantener al jugador informado de su progreso es crucial para la experiencia de juego. Por ello, se implementó un sistema de actualización de estadísticas que combina las propiedades del temporizador (`Timer` tick) y variables de estado internas. Cada segundo, o cada vez que el jugador da un paso, se actualizan las etiquetas (`Label`) de la interfaz, concatenando cadenas de texto (`string interpolation`) con el nivel actual, elementos recolectados, pasos totales y tiempo en segundos.
 
+**Herramientas de Visual Studio (UI):** `Timer` y `Label`.
+**Función:** Un componente `Timer` funciona de fondo (con `.Interval` en milisegundos) disparando el evento `Tick` cada segundo para sumar tiempo. Para desplegar texto en pantalla (HUD) se utilizan componentes `Label`, a los cuales se les modifica dinámicamente su propiedad `.Text`.
+
 **Evidencia de Código (`FormJuego.cs`):**
 ```csharp
 private void gameTimer_Tick(object sender, EventArgs e)
@@ -137,6 +149,9 @@ private void UpdateStats()
 ### Puntos de Inicio y Salida Estructurados
 **Explicación Detallada:** 
 Para asegurar la cohesión lógica de los niveles, cada laberinto define estrictamente su punto de aparición (Spawn) y su meta. Se utilizaron variables de tipo `Point` (estructuras que almacenan X e Y) para registrar estas coordenadas. Durante el método de movimiento, el `GameManager` valida constantemente la posición futura del jugador contra las coordenadas de la meta, garantizando una transición impecable hacia la victoria cuando ambas coordenadas coinciden.
+
+**Herramientas de Visual Studio (UI):** Modificación del Evento Render (sobre el `PictureBox`).
+**Función:** La meta se refleja visualmente utilizando las coordenadas mapeadas hacia el `PictureBox` de la interfaz. Cuando las variables lógicas de Point coinciden, se invoca código de UI (como detener `Timers` y abrir otros Formularios) para culminar el nivel.
 
 **Evidencia de Código (`Level.cs` y `GameManager.cs`):**
 ```csharp
@@ -159,6 +174,9 @@ if (targetCell == 3) // La celda 3 representa la Salida en la matriz
 **Explicación Detallada:** 
 Para evitar que el usuario se dirija únicamente a la salida, se añadieron objetos coleccionables esparcidos por el mapa (representados por el número 2 en la matriz lógica). Al colisionar con estas celdas, el sistema actualiza contadores internos y sobrescribe el valor de la matriz a 0 (camino vacío), haciendo desaparecer visual y lógicamente el objeto en el siguiente cuadro de renderizado.
 
+**Herramientas de Visual Studio (UI):** Invocación de Redibujado (`Invalidate` del `PictureBox`).
+**Función:** Al eliminar el objeto lógico, la interfaz requiere un método que le pida limpiarse y dibujarse nuevamente. Para esto se hace uso del refresco automático del control contenedor (el `PictureBox`), eliminando el icono del apunte de la vista.
+
 **Evidencia de Código (`GameManager.cs`):**
 ```csharp
 if (targetCell == 2) 
@@ -171,6 +189,9 @@ if (targetCell == 2)
 ### Interacciones con Trampas y Potenciadores Dinámicos
 **Explicación Detallada:** 
 Elevando el desafío, se incluyeron celdas especiales: trampas ocultas (`4`) y potenciadores estratégicos (`5`). Pisar una trampa provoca una penalización directa (acelera al enemigo enojándolo), mientras que el potenciador otorga un respiro al jugador congelando las amenazas temporalmente. Esto requiere manipulación directa de propiedades del sistema (como modificar el `.Interval` de un temporizador).
+
+**Herramientas de Visual Studio (UI):** Múltiples componentes `Timer` en la barra de diseño.
+**Función:** Aprovechando que Visual Studio permite arrastrar y aislar múltiples controles `Timer`, se utilizan temporizadores separados (ej. Timer Global vs Timer Enemigo). Al pisar un potenciador, se puede alterar en tiempo real la propiedad `Interval` de un temporizador en específico.
 
 **Evidencia de Código (`GameManager.cs`):**
 ```csharp
@@ -190,6 +211,9 @@ else if (targetCell == 5) // POTENCIADOR (Boost)
 **Explicación Detallada:** 
 En los niveles superiores, un enemigo activo en el mapa busca alcanzar al jugador. Programado con un `Timer` asíncrono, evalúa continuamente las coordenadas del jugador y decide su siguiente movimiento para acortar la distancia, asegurándose de evitar paredes. Esta mecánica simula algoritmos de persecución (como BFS o evaluación heurística simple) e instaura un factor de estrés positivo.
 
+**Herramientas de Visual Studio (UI):** Evento `Tick` de un `Timer` (Enemigo).
+**Función:** Un control `Timer` oculto en la interfaz dedica exclusivamente su evento iterativo (`Tick`) para ejecutar los bucles matemáticos de persecución e invalidar el dibujo para desplazar gráficamente al enemigo cada x milisegundos.
+
 **Evidencia de Código (`GameManager.cs`):**
 ```csharp
 private void MoveEnemy()
@@ -207,6 +231,9 @@ private void MoveEnemy()
 ### Niebla de Guerra y Nivel Oculto (Modo Hardcore)
 **Explicación Detallada:** 
 Para jugadores veteranos, se implementó un modo "Hardcore". Activar este modo habilita un efecto de "Niebla de Guerra", donde solo un radio visible alrededor del jugador se dibuja de forma normal. Las celdas más allá de este límite (calculado mediante la fórmula de distancia euclidiana) se cubren de oscuridad (renderizadas en negro). Superar el juego en estas condiciones desbloquea un masivo Nivel 4 de 25x25.
+
+**Herramientas de Visual Studio (UI):** Clases gráficas como `Graphics` y `Brush`.
+**Función:** En la caja de herramientas de dibujo (del evento Paint del formulario/panel), se hace uso de métodos nativos visuales (como `e.Graphics.FillRectangle(Brushes.Black, ...)`) para superponer parches negros de oscuridad pura, bloqueando la visibilidad del componente de fondo subyacente.
 
 **Evidencia de Código (`FormJuego.cs` y `Level.cs`):**
 ```csharp
@@ -236,6 +263,9 @@ case 4:
 **Explicación Detallada:** 
 Se le otorga identidad al jugador permitiendo personalizar su representación visual. Mediante el uso de componentes del sistema operativo (`OpenFileDialog`), el software permite navegar por el disco duro del usuario, aplicar filtros de extensión (`.png`, `.jpg`) y cargar un archivo gráfico a la memoria RAM de la aplicación, utilizándolo dinámicamente durante el juego.
 
+**Herramientas de Visual Studio (UI):** `OpenFileDialog` y `PictureBox`.
+**Función:** El control de arrastrar y soltar `OpenFileDialog` invoca la ventana nativa de explorador de archivos. Luego, la imagen seleccionada se carga como recurso visual a través de la propiedad `.Image` de un elemento `PictureBox` destinado para el Avatar, actualizando instantáneamente la interfaz.
+
 **Evidencia de Código (`FormMenu.cs`):**
 ```csharp
 private void btnUploadAvatar_Click(object sender, EventArgs e)
@@ -256,6 +286,9 @@ private void btnUploadAvatar_Click(object sender, EventArgs e)
 **Explicación Detallada:** 
 Rompiendo con la monotonía de cuadros estáticos, la casilla de salida emplea un cálculo senoidal para crear una ilusión óptica de pulsación (Glow Effect). Esto se logra alterando las dimensiones de la imagen (escalado) en el método de dibujo, creando dinamismo visual sin la necesidad de usar costosos motores de render 3D.
 
+**Herramientas de Visual Studio (UI):** Estructura `Rectangle` e Interfaz Animada mediante `Timer`.
+**Función:** El control `Timer` que controla la pantalla manipula numéricamente una estructura geométrica (el `Rectangle`). Como los dibujos gráficos en Visual Studio basan su tamaño en la variable de su rectángulo contenedor, modificarlo frame a frame crea una animación natural en la interfaz.
+
 **Evidencia de Código (`FormJuego.cs`):**
 ```csharp
 // Escalado de la salida (Meta) con un efecto tipo 'Glow' animado por tiempo
@@ -269,6 +302,9 @@ e.Graphics.DrawImage(Properties.Resources.salida, targetRect); // Dibuja la text
 **Explicación Detallada:** 
 La inmersión se consolida con el aspecto sonoro. Utilizando la clase nativa `System.Media.SoundPlayer`, se implementó música de fondo y efectos especiales que responden a los eventos del juego, mejorando significativamente el feedback auditivo provisto al jugador.
 
+**Herramientas de Visual Studio (UI/Multimedia):** Componente `System.Media.SoundPlayer`.
+**Función:** Es la herramienta provista por el framework .NET para manejar streams de audio en formato .wav. Destaca por tener funciones como `PlayLooping()` que ejecutan la música de fondo sin bloquear ni afectar la fluidez visual de la interfaz gráfica y los controles activos.
+
 **Evidencia de Código (`AudioPlayer.cs`):**
 ```csharp
 public void PlayMusic()
@@ -281,6 +317,9 @@ public void PlayMusic()
 ### Pantallas de Historia y Múltiples Desenlaces (`FormHistoria`)
 **Explicación Detallada:** 
 Añadiendo una capa narrativa al proyecto, el juego evalúa el estado del jugador al concluir los niveles. Si el sistema detecta que el jugador recogió el 100% de los elementos disponibles, instancia el formulario de conclusión enviando un parámetro booleano de éxito total (`perfectEnding = true`), desencadenando un mensaje de victoria óptima. De lo contrario, desencadena un final alternativo.
+
+**Herramientas de Visual Studio (UI):** Instanciación de múltiples `Form` y controles `TextBox` (o `Label`).
+**Función:** Se esconde dinámicamente la ventana principal de Windows Forms, y se instancia mediante código (`new FormHistoria()`) la ventana narrativa de fin. Dentro de esta pantalla, un control de texto grande como un `TextBox` adaptado o `Label` se encarga de mostrar la conclusión variando según las decisiones del jugador.
 
 **Evidencia de Código (`FormHistoria.cs`):**
 ```csharp
